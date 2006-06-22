@@ -1562,6 +1562,12 @@ If WRAP is not nil, the search may wrap around the buffer."
   (interactive)
   (po-previous-entry-with-regexp po-untranslated-regexp t))
 
+(defun po-remove-context-comment (msg)
+  "Removes any KDE-style context comment from msg."
+  (if (string-match "^_:.*\n" msg)
+      (replace-match "" nil nil msg)
+      msg))
+
 (defun po-msgid-to-msgstr ()
   "Use another window to edit msgstr reinitialized with msgid."
   (interactive)
@@ -1569,7 +1575,7 @@ If WRAP is not nil, the search may wrap around the buffer."
   (if (or (eq po-entry-type 'untranslated)
 	  (eq po-entry-type 'obsolete)
 	  (y-or-n-p (_"Really loose previous translation? ")))
-      (po-set-msgstr (po-get-msgid nil)))
+      (po-set-msgstr (po-remove-context-comment (po-get-msgid nil))))
   (message ""))
 
 ;; Obsolete entries.

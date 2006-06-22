@@ -117,6 +117,20 @@ Version number of this version of po-mode.el.")
 		 (const ask))
   :group 'po)
 
+(defcustom po-auto-replace-x-generator t
+  "*Replace the X-Generator field, to promote Emacs' po-mode :-) (GHK)
+  Value is nil, t, or ask."
+  :type '(choice (const nil)
+		 (const t)
+		 (const ask))
+  :group 'po)
+
+(defcustom po-x-generator-string 
+  (concat "Emacs " emacs-version ", po-mode " po-mode-version-string)
+  "* Default value for X-Generator."
+  :type 'string
+  :group 'po)
+
 (defcustom po-default-file-header "\
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR Free Software Foundation, Inc.
@@ -1071,6 +1085,7 @@ all reachable through 'M-x customize', in group 'Emacs.Editing.I18n.Po'."
   (set (make-local-variable 'po-marking-overlay) (po-create-overlay))
 
   (add-hook 'write-contents-hooks 'po-replace-revision-date)
+  (add-hook 'write-contents-hooks 'po-replace-x-generator)
 
   (run-hooks 'po-mode-hook)
   (message (_"You may type 'h' or '?' for a short PO mode reminder.")))
@@ -1270,6 +1285,21 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
 		       t t))))
 	(message ""))
     (message (_"PO-Revision-Date should be adjusted..."))))
+
+(defun po-replace-x-generator ()
+  "Replace the X-Generator field, to promote Emacs' po-mode :-) (GHK)"
+  (if (or (eq po-auto-replace-x-generator t)
+	  (and (eq po-auto-replace-x-generator 'ask)
+	       (y-or-n-p (_"May I set X-Generator? "))))
+      (save-excursion
+	(goto-char (point-min))
+	(if (re-search-forward "^\"X-Generator:.*" nil t)
+	    (let ((buffer-read-only po-read-only))
+	      (replace-match
+	       (concat "\"X-Generator: " po-x-generator-string "\\n\"")
+	       t t))))
+      (message ""))
+  (message (_"X-Generator should be adjusted...")))
 
 ;;; Handling span of entry, entry type and entry attributes.
 

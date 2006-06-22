@@ -110,24 +110,32 @@ Version number of this version of po-mode.el.")
   :type 'boolean
   :group 'po)
 
-(defcustom po-auto-replace-revision-date t
-  "*Automatically revise date in headers.  Value is nil, t, or ask."
+(defcustom po-auto-update-header t
+  "*Automatically update the header.  Value is nil, t, or ask."
   :type '(choice (const nil)
 		 (const t)
 		 (const ask))
   :group 'po)
 
-(defcustom po-auto-replace-x-generator t
-  "*Replace the X-Generator field, to promote Emacs' po-mode :-) (GHK)
-  Value is nil, t, or ask."
-  :type '(choice (const nil)
-		 (const t)
-		 (const ask))
-  :group 'po)
-
-(defcustom po-x-generator-string 
+(defcustom po-x-generator
   (concat "Emacs " emacs-version ", po-mode " po-mode-version-string)
-  "* Default value for X-Generator."
+  "*X-Generator header to identify the editor."
+  :type 'string
+  :group 'po)
+
+(defconst po-translator-default "FULL NAME <EMAIL@ADDRESS>"
+  "Default, empty value for Last-Translator.")
+
+(defcustom po-translator po-translator-default
+  "*The translator's name and email address."
+  :type 'string
+  :group 'po)
+
+(defconst po-language-team-default "LANGUAGE <LL@li.org>"
+  "Default, empty value for Language-Team.")
+
+(defcustom po-language-team po-language-team-default
+  "*Language name and address of mailing list."
   :type 'string
   :group 'po)
 
@@ -1084,8 +1092,7 @@ all reachable through 'M-x customize', in group 'Emacs.Editing.I18n.Po'."
   (set (make-local-variable 'po-string-end) nil)
   (set (make-local-variable 'po-marking-overlay) (po-create-overlay))
 
-  (add-hook 'write-contents-hooks 'po-replace-revision-date)
-  (add-hook 'write-contents-hooks 'po-replace-x-generator)
+  (add-hook 'write-contents-hooks 'po-update-header)
 
   (run-hooks 'po-mode-hook)
   (message (_"You may type 'h' or '?' for a short PO mode reminder.")))
@@ -1261,45 +1268,43 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
 	    (if (not (eobp))
 		(insert "\n")))))))
 
-(defun po-replace-revision-date ()
-  "Replace the revision date by current time in the PO file header."
-  (if (fboundp 'format-time-string)
-      (if (or (eq po-auto-replace-revision-date t)
-	      (and (eq po-auto-replace-revision-date 'ask)
-		   (y-or-n-p (_"May I set PO-Revision-Date? "))))
-	  (save-excursion
-	    (goto-char (point-min))
-	    (if (re-search-forward "^\"PO-Revision-Date:.*" nil t)
-		(let* ((buffer-read-only po-read-only)
-		       (time (current-time))
-		       (seconds (or (car (current-time-zone time)) 0))
-		       (minutes (/ (abs seconds) 60))
-		       (zone (format "%c%02d%02d"
-				     (if (< seconds 0) ?- ?+)
-				     (/ minutes 60)
-				     (% minutes 60))))
-		  (replace-match
-		       (concat "\"PO-Revision-Date: "
-			       (format-time-string "%Y-%m-%d %H:%M" time)
-			       zone "\\n\"")
-		       t t))))
-	(message ""))
-    (message (_"PO-Revision-Date should be adjusted..."))))
+(defmacro po-replace-header-field (condition field replacement)
+  "Replace a header field."
+  `(if ,condition
+       (save-excursion
+	 (goto-char (point-min))
+	 (if (re-search-forward (concat "^\"" ,field ":.*") nil t)
+	     (let ((buffer-read-only po-read-only))
+	       (replace-match
+		(concat "\"" ,field ": " ,replacement "\\n\"")
+		t t))))
+       (message (_"%s should be adjusted...") ,field)))
 
-(defun po-replace-x-generator ()
-  "Replace the X-Generator field, to promote Emacs' po-mode :-) (GHK)"
-  (if (or (eq po-auto-replace-x-generator t)
-	  (and (eq po-auto-replace-x-generator 'ask)
-	       (y-or-n-p (_"May I set X-Generator? "))))
+(defun po-update-header ()
+  "Update fields in the PO file header."
+  (if (or (eq po-auto-update-header t)
+	  (and (eq po-auto-update-header 'ask)
+	       (y-or-n-p (_"May I update the header? "))))
       (save-excursion
-	(goto-char (point-min))
-	(if (re-search-forward "^\"X-Generator:.*" nil t)
-	    (let ((buffer-read-only po-read-only))
-	      (replace-match
-	       (concat "\"X-Generator: " po-x-generator-string "\\n\"")
-	       t t))))
-      (message ""))
-  (message (_"X-Generator should be adjusted...")))
+	(let* ((time (current-time))
+	       (seconds (or (car (current-time-zone time)) 0))
+	       (minutes (/ (abs seconds) 60))
+	       (zone (format "%c%02d%02d"
+			     (if (< seconds 0) ?- ?+)
+			     (/ minutes 60)
+			     (% minutes 60))))
+	  (po-replace-header-field 
+	   (fboundp 'format-time-string)
+	   "PO-Revision-Date"
+	   (concat (format-time-string "%Y-%m-%d %H:%M" time) zone))
+	  (po-replace-header-field
+	   (not (equal po-translator po-translator-default))
+	   "Last-Translator" po-translator)
+	  (po-replace-header-field
+	   (not (equal po-language-team po-language-team-default))
+	   "Language-Team" po-language-team)
+	  (po-replace-header-field t "X-Generator" po-x-generator)))))
+
 
 ;;; Handling span of entry, entry type and entry attributes.
 

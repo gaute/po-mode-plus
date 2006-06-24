@@ -1198,11 +1198,12 @@ Then, update the mode line counters."
 	      (goto-char here))
 
 	    ;; Make another pass just for the fuzzy entries, kind of kludgey.
-	    ;; FIXME: Counts will be wrong if untranslated entries are fuzzy, yet
-	    ;; this should not normally happen.
 	    (goto-char (point-min))
 	    (while (re-search-forward po-fuzzy-regexp nil t)
-	      (setq po-fuzzy-counter (1+ po-fuzzy-counter)))
+	      (po-find-span-of-entry)
+	      (unless (or (eq po-entry-type 'translated)
+			  (eq po-entry-type 'obsolete))
+		(setq po-fuzzy-counter (1+ po-fuzzy-counter))))
 	    (setq po-translated-counter (- po-translated-counter po-fuzzy-counter)))
 	'()))
 

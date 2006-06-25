@@ -875,6 +875,8 @@ Initialize or replace current translation with the original message"))])
       ,@(if (featurep 'xemacs) '(t)
 	  '(:help "Call `ediff' for merging variants"))]
     ["Cycle through auxiliary files" po-subedit-cycle-auxiliary t]
+    ["Insert next argument" po-subedit-insert-next-arg t]
+    ["Insert next tag" po-subedit-insert-next-tag t]
     "---"
     ["Abort edit" po-subedit-abort
      ,@(if (featurep 'xemacs) '(t)
@@ -1106,6 +1108,8 @@ all reachable through 'M-x customize', in group 'Emacs.Editing.I18n.Po'."
     (define-key po-subedit-mode-map "\C-c\C-c" 'po-subedit-exit)
     (define-key po-subedit-mode-map "\C-c\C-e" 'po-subedit-ediff)
     (define-key po-subedit-mode-map "\C-c\C-k" 'po-subedit-abort)
+    (define-key po-subedit-mode-map "\C-c\C-a" 'po-subedit-insert-next-arg)
+    (define-key po-subedit-mode-map "\C-c\C-n" 'po-subedit-insert-next-tag)
     po-subedit-mode-map)
   "Keymap while editing a PO mode entry (or the full PO file).")
 
@@ -2217,6 +2221,8 @@ Run functions on po-subedit-mode-hook."
 		  (re-search-forward "msgid +" nil t)
 		  (setq overlay (po-create-overlay))
 		  (po-highlight overlay (point) end buffer))))
+	  (po-find-args (po-get-msgid nil))
+	  (po-find-xml-tags (po-get-msgid nil))
 	  (setq slot (list marker edit-buffer overlay)
 		po-edited-fields (cons slot po-edited-fields))
 	  (pop-to-buffer edit-buffer)
@@ -2271,6 +2277,55 @@ read `po-subedit-ediff' documentation."
   (interactive)
   (po-edit-msgstr)
   (po-subedit-ediff))
+
+(defvar po-xml-tags-in-msgid '()
+  "List of XML tags in a msgid, found by `po-find-xml-tags'.")
+
+(defvar po-xml-tag-regexp "\\(<[^>]+>\\|&[a-z]+;\\)"
+  "Matches XML tags and entities.")
+
+(defun po-find-xml-tags (msgid)
+  "Find any XML tags in msgid and put them in `po-xml-tags-in-msg'."
+  (setq po-xml-tags-in-msgid (po-find-matches msgid po-xml-tag-regexp)))
+
+(defvar po-args-in-msgid '()
+  "List of arguments in a msgid, found by `po-find-args'.")
+
+(defvar po-args-regexp "\\(%[-+# ]?[0-9*]+?\\(\\.[0-9*]\\)?[hlL]?[cdieEfgGosuxXpn]\\|%L?[0-9]\\|\\$\\[[a-z]+\\]\\|%[A-Z_]+\\|\\$[a-z_]+\\$\\)"
+  "Matches various argument types.
+   %#x %#o %+.0e
+   %[-+ #]?[0-9*]?\\(\\.[0-9*]\\)?[hlL]?[cdieEfgGosuxXpn]
+                              C-style printf arguments
+          http://www.cplusplus.com/ref/cstdio/printf.html
+   %L?[0-9]             %1      Qt
+   \\$[[a-z]+]         $[arg]  OpenOffice.org
+   %[A-Z_]            %ARG    OpenOffice.org
+   \\$[a-z_]+]\\$       $arg$   OpenOffice.org")
+
+(defun po-find-args (msgid)
+  "Find any args in msgid and put them in `po-args-in-msg'."
+  (setq po-args-in-msgid (po-find-matches msgid po-args-regexp)))
+
+(defun po-find-matches (s regexp)
+  "Return a list of all occurences of regexp found in s."
+  (loop for pos = 0 then (match-end 0)
+     while (string-match regexp s pos)
+     collect (match-string 0 s)))
+
+(defun po-subedit-insert-next-tag ()
+  "Insert the next XML tag or entity that occurs in the msgid."
+  (interactive)
+  (if po-xml-tags-in-msgid
+      (insert (pop po-xml-tags-in-msgid))
+      (error (_"No more tags."))))
+
+(defun po-subedit-insert-next-arg ()
+  "Insert the next argument that occurs in the msgid."
+  (interactive)
+  (if po-args-in-msgid
+      (insert (pop po-args-in-msgid))
+      (error (_"No more arguments."))))
+
 
 ;;; String normalization and searching.
 

@@ -1672,40 +1672,40 @@ no entries of the other types."
       ;; wrap around if there is none.
       (if (re-search-forward po-any-msgstr-regexp nil t)
 	  (goto-char (match-beginning 0))
-	(goto-char (point-min)))
-    ;; If over a translated entry, look for an untranslated one first.
-    ;; Else, look for an entry of the same type first.
-    (let ((goal (if (eq po-entry-type 'translated)
-		    'untranslated
-		  po-entry-type)))
-      (while goal
-	;; Find an untranslated entry, or wrap up for a fuzzy entry.
-	(if (eq goal 'untranslated)
-	    (if (and (> po-untranslated-counter 0)
-		     (re-search-forward po-untranslated-regexp nil t))
-		(progn
-		  (goto-char (match-beginning 0))
-		  (setq goal nil))
-	      (goto-char (point-min))
-	      (setq goal 'fuzzy)))
-	;; Find a fuzzy entry, or wrap up for an obsolete entry.
-	(if (eq goal 'fuzzy)
-	    (if (and (> po-fuzzy-counter 0)
-		     (re-search-forward po-fuzzy-regexp nil t))
-		(progn
-		  (goto-char (match-beginning 0))
-		  (setq goal nil))
-	      (goto-char (point-min))
-	      (setq goal 'obsolete)))
-	;; Find an obsolete entry, or wrap up for an untranslated entry.
-	(if (eq goal 'obsolete)
-	    (if (and (> po-obsolete-counter 0)
-		     (re-search-forward po-obsolete-msgstr-regexp nil t))
-		(progn
-		  (goto-char (match-beginning 0))
-		  (setq goal nil))
-	      (goto-char (point-min))
-	      (setq goal 'untranslated))))))
+	  (goto-char (point-min)))
+      ;; If over a translated entry, look for an untranslated one first.
+      ;; Else, look for an entry of the same type first.
+      (let ((goal (if (eq po-entry-type 'translated)
+		      'untranslated
+		      po-entry-type)))
+	(while goal
+	  ;; Find an untranslated entry, or wrap up for a fuzzy entry.
+	  (if (eq goal 'untranslated)
+	      (if (and (> po-untranslated-counter 0)
+		       (re-search-forward po-untranslated-regexp nil t))
+		  (progn
+		    (goto-char (match-beginning 0))
+		    (setq goal nil))
+		  (goto-char (point-min))
+		  (setq goal 'fuzzy)))
+	  ;; Find a fuzzy entry, or wrap up for an obsolete entry.
+	  (if (eq goal 'fuzzy)
+	      (if (and (> po-fuzzy-counter 0)
+		       (re-search-forward po-fuzzy-regexp nil t))
+		  (progn
+		    (goto-char (match-beginning 0))
+		    (setq goal nil))
+		  (goto-char (point-min))
+		  (setq goal 'obsolete)))
+	  ;; Find an obsolete entry, or wrap up for an untranslated entry.
+	  (if (eq goal 'obsolete)
+	      (if (and (> po-obsolete-counter 0)
+		       (re-search-forward po-obsolete-msgstr-regexp nil t))
+		  (progn
+		    (goto-char (match-beginning 0))
+		    (setq goal nil))
+		  (goto-char (point-min))
+		  (setq goal 'untranslated))))))
   ;; Display this entry nicely.
   (po-current-entry))
 

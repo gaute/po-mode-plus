@@ -112,6 +112,12 @@ Version number of this version of po-mode.el.")
   :type 'boolean
   :group 'po)
 
+(defcustom po-auto-select-mode 'by-type
+  "*Workflow preference.
+Set this to `by-type' to translate all the untranslated entries
+before starting on the fuzzy ones. Select `by-order' to translate
+untranslated and fuzzy entries in the same run.")
+
 (defcustom po-auto-update-header t
   "*Automatically update the header.  Value is nil, t, or ask."
   :type '(choice (const nil)
@@ -1657,6 +1663,14 @@ which does not match exactly.")
 ;; Auto-selection feature.
 
 (defun po-auto-select-entry ()
+  "Select the next entry according to the workflow preference
+`po-auto-select-mode'."
+  (interactive)
+  (case po-auto-select-mode
+    ('by-type (po-auto-select-entry-by-type))
+    ('by-order (po-auto-select-entry-by-order))))
+
+(defun po-auto-select-entry-by-type ()
   "Select the next entry having the same type as the current one.
 If none, wrap from the beginning of the buffer with another type,
 going from untranslated to fuzzy, and from fuzzy to obsolete.
@@ -1692,6 +1706,56 @@ no entries of the other types."
 	  (if (eq goal 'fuzzy)
 	      (if (and (> po-fuzzy-counter 0)
 		       (re-search-forward po-fuzzy-regexp nil t))
+		  (progn
+		    (goto-char (match-beginning 0))
+		    (setq goal nil))
+		  (goto-char (point-min))
+		  (setq goal 'obsolete)))
+	  ;; Find an obsolete entry, or wrap up for an untranslated entry.
+	  (if (eq goal 'obsolete)
+	      (if (and (> po-obsolete-counter 0)
+		       (re-search-forward po-obsolete-msgstr-regexp nil t))
+		  (progn
+		    (goto-char (match-beginning 0))
+		    (setq goal nil))
+		  (goto-char (point-min))
+		  (setq goal 'untranslated))))))
+  ;; Display this entry nicely.
+  (po-current-entry))
+
+(defun po-auto-select-entry-by-order ()
+  "Select the next entry that should be translated, either an
+fuzzy or untranslated entry. Select obsolete entries if there are
+no more fuzzy or untranslated ones, or if an obsolete entry is
+already selected. Plain translated entries are always disregarded
+unless there are no entries of the other types."
+  (interactive)
+  (po-find-span-of-entry)
+  (goto-char po-end-of-entry)
+  (if (and (= po-untranslated-counter 0)
+	   (= po-fuzzy-counter 0)
+	   (= po-obsolete-counter 0))
+      ;; All entries are plain translated.  Next entry will do, or
+      ;; wrap around if there is none.
+      (if (re-search-forward po-any-msgstr-regexp nil t)
+	  (goto-char (match-beginning 0))
+	(goto-char (point-min)))
+    ;; If over an obsolete entry, continue looking for obsolete ones.
+    ;; Else, look for an untranslated or fuzzy entry.
+      (let ((goal (if (eq po-entry-type 'obsolete)
+		      'obsolete
+		      'untranslated-or-fuzzy)))
+	(while goal
+	  ;; Find an untranslated or fuzzy entry, or wrap up for an
+	  ;; obsolete entry.
+	  (if (eq goal 'untranslated-or-fuzzy)
+	      (if (and (or (> po-fuzzy-counter 0)
+			   (> po-untranslated-counter 0))
+		       (re-search-forward 
+			(format "\\(%s\\|%s\\)" 
+				po-fuzzy-regexp
+				po-untranslated-regexp)
+			nil t))
 		  (progn
 		    (goto-char (match-beginning 0))
 		    (setq goal nil))

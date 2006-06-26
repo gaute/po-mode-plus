@@ -114,8 +114,8 @@ Version number of this version of po-mode.el.")
 
 (defcustom po-auto-select-mode 'by-type
   "*Workflow preference.
-Set this to `by-type' to translate all the untranslated entries
-before starting on the fuzzy ones. Select `by-order' to translate
+Set this to 'by-type to translate all the untranslated entries
+before starting on the fuzzy ones. Select 'by-order to translate
 untranslated and fuzzy entries in the same run.")
 
 (defcustom po-auto-update-header t
@@ -1576,7 +1576,7 @@ If WRAP is not nil, the search may wrap around the buffer."
   (po-previous-entry-with-regexp po-untranslated-regexp t))
 
 (defun po-remove-context-comment (msg)
-  "Removes any KDE-style context comment from msg."
+  "Removes any KDE-style context comment from MSG."
   (if (string-match "^_:.*\n" msg)
       (replace-match "" nil nil msg)
       msg))

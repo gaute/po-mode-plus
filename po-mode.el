@@ -116,7 +116,11 @@ Version number of this version of po-mode.el.")
   "*Workflow preference.
 Set this to 'by-type to translate all the untranslated entries
 before starting on the fuzzy ones. Select 'by-order to translate
-untranslated and fuzzy entries in the same run.")
+untranslated and fuzzy entries in the same run."
+  :type '(choice 
+	  (const by-type)
+	  (const by-order))
+  :group 'po)
 
 (defcustom po-auto-update-header t
   "*Automatically update the header.  Value is nil, t, or ask."

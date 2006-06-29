@@ -1016,6 +1016,7 @@ Initialize or replace current translation with the original message"))])
     (define-key po-mode-map "a" 'po-cycle-auxiliary)
 ;;;;  (define-key po-mode-map "c" 'po-save-entry)
     (define-key po-mode-map "f" 'po-next-fuzzy-entry)
+    (define-key po-mode-map "g" 'po-select-entry-number)
     (define-key po-mode-map "h" 'po-help)
     (define-key po-mode-map "k" 'po-kill-msgstr)
 ;;;;  (define-key po-mode-map "l" 'po-lookup-lexicons)
@@ -1789,6 +1790,15 @@ unless there are no entries of the other types."
 		  (setq goal 'untranslated))))))
   ;; Display this entry nicely.
   (po-current-entry))
+
+;; Numbered entry.
+
+(defun po-select-entry-number (num)
+  "Go to entry number NUM."
+  (interactive "nEntry number: ")
+  (po-first-entry)
+  (loop for i from 1 to num
+       do (po-next-entry)))
 
 ;;; Killing and yanking fields.
 

@@ -1,6 +1,6 @@
 ;;; po-mode.el -- major mode for GNU gettext PO files
 
-;; Copyright (C) 1995-1999, 2000-2002 Free Software Foundation, Inc.
+;; Copyright (C) 1995-1999, 2000-2002, 2005 Free Software Foundation, Inc.
 ;; Copyright (C) 2006 Gaute Hvoslef Kvalnes
 
 ;; Authors: François Pinard <pinard@iro.umontreal.ca>
@@ -267,6 +267,7 @@ slightly different."
     ("Hindi" . "hi")
     ("Hiri Motu" . "ho")
     ("Hungarian" . "hu")
+    ("Hyam" . "jab")
     ("Icelandic" . "is")
     ("Ido" . "io")
     ("Indonesian" . "id")
@@ -278,6 +279,8 @@ slightly different."
     ("Italian" . "it")
     ("Japanese" . "ja")
     ("Javanese" . "jv")
+    ("Jju" . "kaj")
+    ("Kagoma" . "kdm")
     ("Kalaallisut" . "kl")
     ("Kannada" . "kn")
     ("Kashmiri" . "ks")
@@ -298,7 +301,9 @@ slightly different."
     ("Letzeburgesch" . "lb")
     ("Lingala" . "ln")
     ("Lithuanian" . "lt")
+    ("Low Saxon" . "nds")
     ("Macedonian" . "mk")
+    ("Maithili" . "mai")
     ("Malagasy" . "mg")
     ("Malay" . "ms")
     ("Malayalam" . "ml")
@@ -308,21 +313,26 @@ slightly different."
     ("Maori" . "mi")
     ("Marathi" . "mr")
     ("Marshall" . "mh")
+    ("Mayan" . "myn")
     ("Moldavian" . "mo")
     ("Mongolian" . "mn")
+    ("Nahuatl" . "nah")
     ("Nauru" . "na")
     ("Navajo" . "nv")
     ("Ndonga" . "ng")
     ("Nepali" . "ne")
     ("North Ndebele" . "nd")
     ("Northern Sami" . "se")
+    ("Northern Sotho" . "nso")
     ("Norwegian Bokmal" . "nb")
     ("Norwegian Nynorsk" . "nn")
     ("Norwegian" . "no")
     ("Nyanja" . "ny")
     ("Occitan" . "oc")
+    ("Old English" . "ang")
     ("Oriya" . "or")
     ("Ossetian" . "os")
+    ("Páez" . "pbb")
     ("Pali" . "pi")
     ("Pashto" . "ps")
     ("Persian" . "fa")
@@ -360,6 +370,7 @@ slightly different."
     ("Tamil" . "ta")
     ("Tatar" . "tt")
     ("Telugu" . "te")
+    ("Tetum" . "tet")
     ("Thai" . "th")
     ("Tibetan" . "bo")
     ("Tigrinya" . "ti")
@@ -368,6 +379,7 @@ slightly different."
     ("Turkish" . "tr")
     ("Turkmen" . "tk")
     ("Twi" . "tw")
+    ("Tyap" . "kcg")
     ("Uighur" . "ug")
     ("Ukrainian" . "uk")
     ("Urdu" . "ur")
@@ -380,6 +392,7 @@ slightly different."
     ("Xhosa" . "xh")
     ("Yiddish" . "yi")
     ("Yoruba" . "yo")
+    ("Zapotec" . "zap")
     ("Zhuang" . "za")
     ("Zulu" . "zu")
     )
@@ -3263,6 +3276,11 @@ Leave point after marked string."
 (defun po-validate ()
   "Use 'msgfmt' for validating the current PO file contents."
   (interactive)
+  ; The 'compile' subsystem is autoloaded through a call to (compile ...).
+  ; We need to initialize it outside of any binding. Without this statement,
+  ; all defcustoms and defvars of compile.el would be undone when the let*
+  ; terminates.
+  (require 'compile)
   (let* ((dev-null
 	  (cond ((boundp 'null-device) null-device) ; since Emacs 20.3
 		((memq system-type '(windows-nt windows-95)) "NUL")

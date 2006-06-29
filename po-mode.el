@@ -681,6 +681,10 @@ No doubt that highlighting, when Emacs does not allow it, is a kludge."
 (defvar po-string-start)
 (defvar po-string-end)
 (defvar po-marking-overlay)
+
+;; The buffer where search results should show up. This is suggested
+;; to be in a separate frame that is always open.
+(defvar po-search-buffer "*po-search*")
 
 ;;; PO mode variables and constants (usually not to customize).
 
@@ -898,6 +902,7 @@ Initialize or replace current translation with the original message"))])
       ,@(if (featurep 'xemacs) '(t)
 	  '(:help "Call `ediff' for merging variants"))]
     ["Cycle through auxiliary files" po-subedit-cycle-auxiliary t]
+    ["Insert search result" po-insert-search-result t]
     ["Insert next argument" po-subedit-insert-next-arg t]
     ["Insert next tag" po-subedit-insert-next-tag t]
     "---"
@@ -1013,6 +1018,10 @@ Initialize or replace current translation with the original message"))])
     (define-key po-mode-map "<" 'po-first-entry)
     (define-key po-mode-map "=" 'po-statistics)
     (define-key po-mode-map ">" 'po-last-entry)
+    ;; FIXME: The following two are probably only useful on Norwegian
+    ;; Mac keyboards :-)
+    (define-key po-mode-map "@" 'po-search)
+    (define-key po-mode-map "*" 'po-copy-search-to-msgstr)
     (define-key po-mode-map "a" 'po-cycle-auxiliary)
 ;;;;  (define-key po-mode-map "c" 'po-save-entry)
     (define-key po-mode-map "f" 'po-next-fuzzy-entry)
@@ -1132,6 +1141,8 @@ all reachable through 'M-x customize', in group 'Emacs.Editing.I18n.Po'."
     (define-key po-subedit-mode-map "\C-c\C-c" 'po-subedit-exit)
     (define-key po-subedit-mode-map "\C-c\C-e" 'po-subedit-ediff)
     (define-key po-subedit-mode-map "\C-c\C-k" 'po-subedit-abort)
+    ;; FIXME: C-c letter should perhaps be avoided?
+    (define-key po-subedit-mode-map "\C-c*" 'po-subedit-insert-search-result)
     (define-key po-subedit-mode-map "\C-c\C-a" 'po-subedit-insert-next-arg)
     (define-key po-subedit-mode-map "\C-c\C-n" 'po-subedit-insert-next-tag)
     po-subedit-mode-map)
@@ -2599,6 +2610,87 @@ without moving its cursor."
 	(po-consider-as-auxiliary)
 	(or (po-seek-equivalent-translation name string)
 	    (find-file name)))))
+
+(defvar po-base-dir "/Users/gaute/skulelinux/trunk/i18n/kde/nn/messages/")
+(defvar po-auxiliary-base-dir "/Users/gaute/skulelinux/trunk/i18n/kde/nb/messages/")
+
+(defun po-auxiliary-file ()
+  "Returns the name of the auxiliary file to the current file, or
+nil if the auxiliary file doesn't exist."
+  (let ((aux (replace-regexp-in-string po-base-dir po-auxiliary-base-dir
+				       (buffer-file-name))))
+    (if (file-exists-p aux)
+	aux)))
+
+(defun po-search ()
+  "Searches for a translation of the current entry and displays
+it in `po-search-buffer'."
+  (interactive)
+  (po-search-file (po-auxiliary-file)))
+
+(defun po-search-file (name)
+  "Search a PO file NAME for a msgid equal to the current
+msgid. Display the result in `po-search-buffer'.
+
+This function is heavily based on `po-seek-equivalent-translation'. 
+They should probably be merged, somehow."
+  (po-find-span-of-entry)
+  (let ((msgid (buffer-substring po-start-of-msgid po-start-of-msgstr))
+	string
+	(current (current-buffer))
+	(buffer (find-file-noselect name)))
+    (set-buffer buffer)
+    (let ((start (point))
+	  found)
+      (goto-char (point-min))
+      (while (and (not found) (search-forward msgid nil t))
+	;; Screen out longer 'msgid's.
+	(if (looking-at "^msgstr ")
+	    (progn
+	      (po-find-span-of-entry)
+	      ;; Ignore an untranslated entry.
+	      (or (string-equal
+		   (buffer-substring po-start-of-msgstr po-end-of-entry)
+		   "msgstr \"\"\n")
+		  (setq found t)))))
+      (if found
+	  (progn
+	    (set-buffer buffer)
+	    (po-find-span-of-entry)
+	    (setq string (po-get-msgstr nil))
+	    (set-buffer po-search-buffer)
+	    (delete-region (point-min) (point-max))
+	    (insert string))
+	  (message (_"Not found.")))
+      found)))
+
+(defun po-copy-search-to-msgstr ()
+  "Copies the search result to the msgstr."
+  (interactive)
+  (po-find-span-of-entry)
+  (let ((buffer-read-only po-read-only)
+	(entry-type po-entry-type)
+	replacement)
+    (save-excursion
+      (set-buffer po-search-buffer)
+      (if (or (eq entry-type 'untranslated)
+	      (eq entry-type 'obsolete)
+	      (y-or-n-p (_"Really loose previous translation? ")))
+	  (setq replacement (buffer-string))))
+    (when replacement
+      (po-set-msgstr replacement))))
+
+(defun po-subedit-insert-search-result ()
+  "Inserts the search result into the buffer. Intended for the
+subedit buffer. FIXME: Should it ask for confirmation before
+overwriting anything, or is regular undo safe enough?"
+  (interactive)
+  (let (replacement)
+    (save-excursion
+      (set-buffer po-search-buffer)
+      (setq replacement (buffer-string)))
+    (delete-region (point-min) (point-max))
+    (insert replacement)))
 
 ;;; Original program sources as context.
 

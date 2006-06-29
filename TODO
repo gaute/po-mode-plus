@@ -1,0 +1,15 @@
+- Linewrapping in the subedit. Can we use longlines.el or get hints from it?
+
+- Improve the auxiliary feature. I want another window/frame that
+  displays the auxiliary translation in real-time, much like KBabel's
+  search view. This should perhaps be a generic view that allows for
+  other kinds of searches as well. Easy copying to the msgstr is a
+  must.
+
+- Search and replace in the entire file.
+
+- Ignore certain characters when searching. (accelerators & ~)
+
+- Syntax highlighting in the strings. Tags, arguments, etc. I'd like
+  to have it both in the main buffer and in the subedit. For example,
+  the final "<" character should be toned down.

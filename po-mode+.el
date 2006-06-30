@@ -44,7 +44,7 @@
 ;;  `po-subedit-insert-next-tag' and `po-subedit-insert-next-arg' are
 ;;  useful functions taken from KBabel. Since (XML) tags and arguments
 ;;  normally should be kept verbatim in the translation, it's nice to
-;;  have an easy way to insert them. C-c C-n inserts the next tag,
+;;  have an easy way to insert them. C-c C-t inserts the next tag,
 ;;  while C-c C-a inserts the next argument.
 ;;
 ;;  `po-auto-select-mode' provides two alternative workflows.
@@ -528,7 +528,7 @@ all reachable through 'M-x customize', in group 'Emacs.Editing.I18n.Po'."
     ;; FIXME: C-c letter should perhaps be avoided?
     (define-key po-subedit-mode-map "\C-c*" 'po-subedit-insert-search-result)
     (define-key po-subedit-mode-map "\C-c\C-a" 'po-subedit-insert-next-arg)
-    (define-key po-subedit-mode-map "\C-c\C-n" 'po-subedit-insert-next-tag)
+    (define-key po-subedit-mode-map "\C-c\C-t" 'po-subedit-insert-next-tag)
     po-subedit-mode-map)
   "Keymap while editing a PO mode entry (or the full PO file).")
 

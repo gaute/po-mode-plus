@@ -4,11 +4,11 @@
 ;; Description: Extensions to GNU gettext's `po-mode.el'.
 ;; Author: Gaute Hvoslef Kvalnes <gaute@verdsveven.com>
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
-;; Created: Thu Jun 29 21:35:47 CEST 2006
+;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.1
-;; Last-Updated: Fri Jun 30 16:07:16 2006 (7200 CEST)
+;; Last-Updated: Fri Jun 30 16:14:30 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 36
+;;     Update #: 38
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -287,6 +287,7 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
 
 
 ;;; Processing the PO file header entry.
+;; This replaces `po-replace-revision-date'.
 
 (defmacro po-replace-header-field (condition field replacement)
   "Replace a header field."

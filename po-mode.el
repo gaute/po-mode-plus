@@ -55,6 +55,10 @@
 (defconst po-mode-version-string "2.01.ghk.3" "\
 Version number of this version of po-mode.el.")
 
+;; Some Common Lisp macros are used:
+;; loop
+(eval-when-compile (require 'cl))
+
 ;;; Emacs portability matters - part I.
 ;;; Here is the minimum for customization to work.  See part II.
 
@@ -2302,6 +2306,7 @@ When done with the `ediff' session press \\[exit-recursive-edit] exit to
   "Prepare a pop up buffer for editing STRING, which is of a given TYPE.
 TYPE may be 'comment or 'msgstr.  If EXPAND-TABS, expand tabs to spaces.
 Run functions on po-subedit-mode-hook."
+  (run-hooks 'po-before-subedit-mode-hook)
   (let ((marker (make-marker)))
     (set-marker marker (cond ((eq type 'comment) po-start-of-msgid)
 			     ((eq type 'msgstr) po-start-of-msgstr)))
@@ -2611,8 +2616,10 @@ without moving its cursor."
 	(or (po-seek-equivalent-translation name string)
 	    (find-file name)))))
 
-(defvar po-base-dir "/Users/gaute/skulelinux/trunk/i18n/kde/nn/messages/")
-(defvar po-auxiliary-base-dir "/Users/gaute/skulelinux/trunk/i18n/kde/nb/messages/")
+(remove-hook 'po-before-subedit-mode-hook 'po-search)
+
+(defvar po-base-dir "/Users/gaute/skulelinux/trunk/i18n/openoffice/po/nn/")
+(defvar po-auxiliary-base-dir "/Users/gaute/skulelinux/trunk/i18n/openoffice/po/da/")
 
 (defun po-auxiliary-file ()
   "Returns the name of the auxiliary file to the current file, or
@@ -2675,7 +2682,7 @@ They should probably be merged, somehow."
       (set-buffer po-search-buffer)
       (if (or (eq entry-type 'untranslated)
 	      (eq entry-type 'obsolete)
-	      (y-or-n-p (_"Really loose previous translation? ")))
+	      (y-or-n-p (_"Really lose previous translation? ")))
 	  (setq replacement (buffer-string))))
     (when replacement
       (po-set-msgstr replacement))))
@@ -2691,6 +2698,12 @@ overwriting anything, or is regular undo safe enough?"
       (setq replacement (buffer-string)))
     (delete-region (point-min) (point-max))
     (insert replacement)))
+
+;; (defun po-create-search-frame ()
+;;   "Create a small frame to hold the *po-search* buffer."
+;;   (interactive)
+;;   (save-excursion
+    
 
 ;;; Original program sources as context.
 

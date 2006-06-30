@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.1
-;; Last-Updated: Fri Jun 30 16:22:59 2006 (7200 CEST)
+;; Last-Updated: Fri Jun 30 16:26:57 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 42
+;;     Update #: 43
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -202,8 +202,7 @@ M-S  Ignore path          M-A  Ignore PO file      *M-L  Ignore lexicon
   "Help page for PO mode.")
 
 ;; REPLACES ORIGINAL in `po-mode.el'
-;; Added `po-subedit-insert-search-result', `po-subedit-insert-next-arg'
-;; and `po-subedit-insert-next-tag'.
+;; Added `po-subedit-insert-next-arg' and `po-subedit-insert-next-tag'.
 (defconst po-subedit-mode-menu-layout
   `("PO-Edit"
     ["Ediff and merge translation variants" po-subedit-ediff

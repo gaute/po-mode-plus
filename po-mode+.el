@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 29 21:35:47 CEST 2006
 ;; Version: 0.3
-;; Last-Updated: Fri Jun 30 02:20:18 2006 (7200 CEST)
+;; Last-Updated: Fri Jun 30 14:53:05 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 18
+;;     Update #: 19
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -872,91 +872,6 @@ Run functions on po-subedit-mode-hook."
   (if po-args-in-msgid
       (insert (pop po-args-in-msgid))
       (error (_"No more arguments."))))
-
-
-;;; Multiple PO files.
-
-(defvar po-base-dir "/Users/gaute/skulelinux/trunk/i18n/openoffice/po/nn/")
-(defvar po-auxiliary-base-dir "/Users/gaute/skulelinux/trunk/i18n/openoffice/po/da/")
-
-(defun po-auxiliary-file ()
-  "Returns the name of the auxiliary file to the current file, or
-nil if the auxiliary file doesn't exist."
-  (let ((aux (replace-regexp-in-string po-base-dir po-auxiliary-base-dir
-				       (buffer-file-name))))
-    (if (file-exists-p aux)
-	aux)))
-
-(defun po-search ()
-  "Searches for a translation of the current entry and displays
-it in `po-search-buffer'."
-  (interactive)
-  (po-search-file (po-auxiliary-file)))
-
-(defun po-search-file (name)
-  "Search a PO file NAME for a msgid equal to the current
-msgid. Display the result in `po-search-buffer'.
-
-This function is heavily based on `po-seek-equivalent-translation'. 
-They should probably be merged, somehow."
-  (po-find-span-of-entry)
-  (let ((msgid (buffer-substring po-start-of-msgid po-start-of-msgstr))
-	string
-	(current (current-buffer))
-	(buffer (find-file-noselect name)))
-    (set-buffer buffer)
-    (let ((start (point))
-	  found)
-      (goto-char (point-min))
-      (while (and (not found) (search-forward msgid nil t))
-	;; Screen out longer 'msgid's.
-	(if (looking-at "^msgstr ")
-	    (progn
-	      (po-find-span-of-entry)
-	      ;; Ignore an untranslated entry.
-	      (or (string-equal
-		   (buffer-substring po-start-of-msgstr po-end-of-entry)
-		   "msgstr \"\"\n")
-		  (setq found t)))))
-      (if found
-	  (progn
-	    (set-buffer buffer)
-	    (po-find-span-of-entry)
-	    (setq string (po-get-msgstr nil))
-	    (set-buffer po-search-buffer)
-	    (delete-region (point-min) (point-max))
-	    (insert string))
-	  (message (_"Not found.")))
-      found)))
-
-(defun po-copy-search-to-msgstr ()
-  "Copies the search result to the msgstr."
-  (interactive)
-  (po-find-span-of-entry)
-  (let ((buffer-read-only po-read-only)
-	(entry-type po-entry-type)
-	replacement)
-    (save-excursion
-      (set-buffer po-search-buffer)
-      (if (or (eq entry-type 'untranslated)
-	      (eq entry-type 'obsolete)
-	      (y-or-n-p (_"Really lose previous translation? ")))
-	  (setq replacement (buffer-string))))
-    (when replacement
-      (po-set-msgstr replacement))))
-
-(defun po-subedit-insert-search-result ()
-  "Inserts the search result into the buffer. Intended for the
-subedit buffer. FIXME: Should it ask for confirmation before
-overwriting anything, or is regular undo safe enough?"
-  (interactive)
-  (let (replacement)
-    (save-excursion
-      (set-buffer po-search-buffer)
-      (setq replacement (buffer-string)))
-    (delete-region (point-min) (point-max))
-    (insert replacement)))
-
 
 (provide 'po-mode+)
 

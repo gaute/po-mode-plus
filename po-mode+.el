@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 29 21:35:47 CEST 2006
 ;; Version: 0.1
-;; Last-Updated: Fri Jun 30 15:31:41 2006 (7200 CEST)
+;; Last-Updated: Fri Jun 30 15:47:46 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 25
+;;     Update #: 33
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -88,6 +88,10 @@
 ;;; Code:
 (require 'po-mode)
 
+;; Some Common Lisp macros are used:
+;;   loop
+(eval-when-compile (require 'cl))
+
 (defconst po-mode-+-version-string "0.1" "\
 Version number of this version of po-mode+.el.")
 
@@ -102,9 +106,12 @@ Version number of this version of po-mode+.el.")
     (message msg)
     msg))
 
-;; Some Common Lisp macros are used:
-;;   loop
-(eval-when-compile (require 'cl))
+(defun po-mode+ ()
+  "To be run on `po-mode-hook'."
+  (add-hook 'write-contents-hooks 'po-update-header)
+  (define-key po-mode-map "g" 'po-select-entry-number))
+
+(add-hook 'po-mode-hook 'po-mode+)
 
 ;;; Customisation.
 
@@ -146,13 +153,8 @@ untranslated and fuzzy entries in the same run."
   :type 'string
   :group 'po)
 
-
-;;; Buffer local variables.
-
-;;; PO mode variables and constants (usually not to customize).
-
 ;; REPLACES ORIGINAL in `po-mode.el'
-;; FIXME: Add keys here.
+;; Added "g".
 (defconst po-help-display-string
   (_"\
 PO Mode Summary           Next Previous            Miscellaneous
@@ -191,7 +193,6 @@ M-S  Ignore path          M-A  Ignore PO file      *M-L  Ignore lexicon
       ,@(if (featurep 'xemacs) '(t)
 	  '(:help "Call `ediff' for merging variants"))]
     ["Cycle through auxiliary files" po-subedit-cycle-auxiliary t]
-    ["Insert search result" po-insert-search-result t]
     ["Insert next argument" po-subedit-insert-next-arg t]
     ["Insert next tag" po-subedit-insert-next-tag t]
     "---"
@@ -202,141 +203,6 @@ M-S  Ignore path          M-A  Ignore PO file      *M-L  Ignore lexicon
      ,@(if (featurep 'xemacs) '(t)
 	 '(:help "Use this text as the translation and close current edit buffer"))])
   "Menu layout for PO subedit mode.")
-
-
-;;; Mode activation.
-
-;; REPLACES ORIGINAL in `po-mode.el'
-;; Added "g".
-(defvar po-mode-map
-  ;; Use (make-keymap) because (make-sparse-keymap) does not work on Demacs.
-  (let ((po-mode-map (make-keymap)))
-    (suppress-keymap po-mode-map)
-    (define-key po-mode-map "\C-i" 'po-unfuzzy)
-    (define-key po-mode-map "\C-j" 'po-msgid-to-msgstr)
-    (define-key po-mode-map "\C-m" 'po-edit-msgstr)
-    (define-key po-mode-map " " 'po-auto-select-entry)
-    (define-key po-mode-map "?" 'po-help)
-    (define-key po-mode-map "#" 'po-edit-comment)
-    (define-key po-mode-map "," 'po-tags-search)
-    (define-key po-mode-map "." 'po-current-entry)
-    (define-key po-mode-map "<" 'po-first-entry)
-    (define-key po-mode-map "=" 'po-statistics)
-    (define-key po-mode-map ">" 'po-last-entry)
-    (define-key po-mode-map "a" 'po-cycle-auxiliary)
-;;;;  (define-key po-mode-map "c" 'po-save-entry)
-    (define-key po-mode-map "f" 'po-next-fuzzy-entry)
-    (define-key po-mode-map "g" 'po-select-entry-number)
-    (define-key po-mode-map "h" 'po-help)
-    (define-key po-mode-map "k" 'po-kill-msgstr)
-;;;;  (define-key po-mode-map "l" 'po-lookup-lexicons)
-    (define-key po-mode-map "m" 'po-push-location)
-    (define-key po-mode-map "n" 'po-next-entry)
-    (define-key po-mode-map "o" 'po-next-obsolete-entry)
-    (define-key po-mode-map "p" 'po-previous-entry)
-    (define-key po-mode-map "q" 'po-confirm-and-quit)
-    (define-key po-mode-map "r" 'po-pop-location)
-    (define-key po-mode-map "s" 'po-cycle-source-reference)
-    (define-key po-mode-map "t" 'po-next-translated-entry)
-    (define-key po-mode-map "u" 'po-next-untranslated-entry)
-    (define-key po-mode-map "v" 'po-mode-version)
-    (define-key po-mode-map "w" 'po-kill-ring-save-msgstr)
-    (define-key po-mode-map "x" 'po-exchange-location)
-    (define-key po-mode-map "y" 'po-yank-msgstr)
-    (define-key po-mode-map "A" 'po-consider-as-auxiliary)
-    (define-key po-mode-map "E" 'po-edit-out-full)
-    (define-key po-mode-map "F" 'po-previous-fuzzy-entry)
-    (define-key po-mode-map "K" 'po-kill-comment)
-;;;;  (define-key po-mode-map "L" 'po-consider-lexicon-file)
-    (define-key po-mode-map "M" 'po-send-mail)
-    (define-key po-mode-map "O" 'po-previous-obsolete-entry)
-    (define-key po-mode-map "T" 'po-previous-translated-entry)
-    (define-key po-mode-map "U" 'po-previous-untranslated-entry)
-    (define-key po-mode-map "Q" 'po-quit)
-    (define-key po-mode-map "S" 'po-consider-source-path)
-    (define-key po-mode-map "V" 'po-validate)
-    (define-key po-mode-map "W" 'po-kill-ring-save-comment)
-    (define-key po-mode-map "Y" 'po-yank-comment)
-    (define-key po-mode-map "_" 'po-undo)
-    (define-key po-mode-map "0" 'po-other-window)
-    (define-key po-mode-map "\177" 'po-fade-out-entry)
-    (define-key po-mode-map "\C-c\C-a" 'po-select-auxiliary)
-    (define-key po-mode-map "\C-c\C-e" 'po-edit-msgstr-and-ediff)
-    (define-key po-mode-map [?\C-c?\C-#] 'po-edit-comment-and-ediff)
-    (define-key po-mode-map "\C-c\C-C" 'po-edit-comment-and-ediff)
-    (define-key po-mode-map "\M-," 'po-mark-translatable)
-    (define-key po-mode-map "\M-." 'po-select-mark-and-mark)
-;;;;  (define-key po-mode-map "\M-c" 'po-select-and-save-entry)
-;;;;  (define-key po-mode-map "\M-l" 'po-edit-lexicon-entry)
-    (define-key po-mode-map "\M-s" 'po-select-source-reference)
-    (define-key po-mode-map "\M-A" 'po-ignore-as-auxiliary)
-;;;;  (define-key po-mode-map "\M-L" 'po-ignore-lexicon-file)
-    (define-key po-mode-map "\M-S" 'po-ignore-source-path)
-    po-mode-map)
-  "Keymap for PO mode.")
-
-;; REPLACES ORIGINAL in `po-mode.el'
-;; FIXME: Do I need to reimplement this, or can I just use `po-mode-hook'?
-;; Added 
-(defun po-mode ()
-  "Major mode for translators when they edit PO files.
-
-Special commands:
-\\{po-mode-map}
-Turning on PO mode calls the value of the variable 'po-mode-hook',
-if that value is non-nil.  Behaviour may be adjusted through some variables,
-all reachable through 'M-x customize', in group 'Emacs.Editing.I18n.Po'."
-  (interactive)
-  (kill-all-local-variables)
-  (setq major-mode 'po-mode
-	mode-name "PO")
-  (use-local-map po-mode-map)
-  (if (fboundp 'easy-menu-define)
-      (progn
-	(easy-menu-define po-mode-menu po-mode-map "" po-mode-menu-layout)
-	(and po-XEMACS (easy-menu-add po-mode-menu))))
-  (set (make-local-variable 'font-lock-defaults) '(po-font-lock-keywords t))
-
-  (set (make-local-variable 'po-read-only) buffer-read-only)
-  (setq buffer-read-only t)
-
-  (make-local-variable 'po-start-of-entry)
-  (make-local-variable 'po-start-of-msgid)
-  (make-local-variable 'po-start-of-msgstr)
-  (make-local-variable 'po-end-of-entry)
-  (make-local-variable 'po-entry-type)
-
-  (make-local-variable 'po-translated-counter)
-  (make-local-variable 'po-fuzzy-counter)
-  (make-local-variable 'po-untranslated-counter)
-  (make-local-variable 'po-obsolete-counter)
-  (make-local-variable 'po-mode-line-string)
-
-  (setq po-mode-flag t)
-
-  (po-check-file-header)
-  (po-compute-counters nil)
-
-  (set (make-local-variable 'po-edited-fields) nil)
-  (set (make-local-variable 'po-marker-stack) nil)
-  (set (make-local-variable 'po-search-path) '(("./") ("../")))
-
-  (set (make-local-variable 'po-reference-alist) nil)
-  (set (make-local-variable 'po-reference-cursor) nil)
-  (set (make-local-variable 'po-reference-check) 0)
-
-  (set (make-local-variable 'po-keywords)
-       '(("gettext") ("gettext_noop") ("_") ("N_")))
-  (set (make-local-variable 'po-string-contents) nil)
-  (set (make-local-variable 'po-string-buffer) nil)
-  (set (make-local-variable 'po-string-start) nil)
-  (set (make-local-variable 'po-string-end) nil)
-  (set (make-local-variable 'po-marking-overlay) (po-create-overlay))
-
-  (add-hook 'write-contents-hooks 'po-update-header)
-
-  (run-hooks 'po-mode-hook)
-  (message (_"You may type 'h' or '?' for a short PO mode reminder.")))
 
 ;; REPLACES ORIGINAL in `po-mode.el'
 ;; Added "\C-c*", "\C-c\C-a" and "\C-c\C-n".
@@ -452,7 +318,6 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
 	   "Language-Team" po-language-team)
 	  (po-replace-header-field t "X-Generator" po-x-generator)))))
 
-
 (defun po-remove-context-comment (msg)
   "Removes any KDE-style context comment from MSG."
   (if (string-match "^_:.*\n" msg)
@@ -460,7 +325,7 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
       msg))
 
 ;; REPLACES ORIGINAL in `po-mode.el'
-;; Remove KDE-style context comments before copying.
+;; Modified to remove KDE-style context comments before copying.
 (defun po-msgid-to-msgstr ()
   "Initialize msgstr with msgid."
   (interactive)
@@ -471,7 +336,8 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
       (po-set-msgstr (po-remove-context-comment (po-get-msgid nil))))
   (message ""))
 
-;; Auto-selection feature.
+
+;;; Moving around.
 
 ;; REPLACES ORIGINAL in `po-mode.el'
 (defun po-auto-select-entry ()
@@ -583,8 +449,6 @@ unless there are no entries of the other types."
   ;; Display this entry nicely.
   (po-current-entry))
 
-;; Numbered entry.
-
 (defun po-select-entry-number (num)
   "Go to entry number NUM."
   (interactive "nEntry number: ")
@@ -662,17 +526,15 @@ Run functions on po-subedit-mode-hook."
 
 (defvar po-args-regexp "\\(%[-+# ]?[0-9*]+?\\(\\.[0-9*]\\)?[hlL]?[cdieEfgGosuxXpn]\\|%L?[0-9]\\|\\$\\[[a-z]+\\]\\|%[A-Z_]+\\|\\$[a-z_]+\\$\\)"
   "Matches various argument types.
-   %#x %#o %+.0e
    %[-+ #]?[0-9*]?\\(\\.[0-9*]\\)?[hlL]?[cdieEfgGosuxXpn]
                               C-style printf arguments
-          http://www.cplusplus.com/ref/cstdio/printf.html
    %L?[0-9]             %1      Qt
    \\$[[a-z]+]         $[arg]  OpenOffice.org
    %[A-Z_]            %ARG    OpenOffice.org
    \\$[a-z_]+]\\$       $arg$   OpenOffice.org")
 
 (defun po-find-args (msgid)
-  "Find any args in msgid and put them in `po-args-in-msg'."
+  "Find any arguments in msgid and put them in `po-args-in-msg'."
   (setq po-args-in-msgid (po-find-matches msgid po-args-regexp)))
 
 (defun po-find-matches (s regexp)

@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.1
-;; Last-Updated: Fri Jun 30 16:15:59 2006 (7200 CEST)
+;; Last-Updated: Fri Jun 30 16:18:19 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 40
+;;     Update #: 41
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -296,8 +296,7 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
 	     (let ((buffer-read-only po-read-only))
 	       (replace-match
 		(concat "\"" ,field ": " ,replacement "\\n\"")
-		t t))))
-       (message (_"%s should be adjusted...") ,field)))
+		t t))))))
 
 (defun po-update-header ()
   "Update fields in the PO file header."

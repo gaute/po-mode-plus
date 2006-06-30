@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.1
-;; Last-Updated: Fri Jun 30 16:14:30 2006 (7200 CEST)
+;; Last-Updated: Fri Jun 30 16:15:59 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 38
+;;     Update #: 40
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -212,7 +212,7 @@ M-S  Ignore path          M-A  Ignore PO file      *M-L  Ignore lexicon
   "Menu layout for PO subedit mode.")
 
 ;; REPLACES ORIGINAL in `po-mode.el'
-;; Added "\C-c*", "\C-c\C-a" and "\C-c\C-n".
+;; Added "\C-c\C-a" and "\C-c\C-n".
 (defvar po-subedit-mode-map
   ;; Use (make-keymap) because (make-sparse-keymap) does not work on Demacs.
   (let ((po-subedit-mode-map (make-keymap)))
@@ -220,8 +220,6 @@ M-S  Ignore path          M-A  Ignore PO file      *M-L  Ignore lexicon
     (define-key po-subedit-mode-map "\C-c\C-c" 'po-subedit-exit)
     (define-key po-subedit-mode-map "\C-c\C-e" 'po-subedit-ediff)
     (define-key po-subedit-mode-map "\C-c\C-k" 'po-subedit-abort)
-    ;; FIXME: C-c letter should perhaps be avoided?
-    (define-key po-subedit-mode-map "\C-c*" 'po-subedit-insert-search-result)
     (define-key po-subedit-mode-map "\C-c\C-a" 'po-subedit-insert-next-arg)
     (define-key po-subedit-mode-map "\C-c\C-t" 'po-subedit-insert-next-tag)
     po-subedit-mode-map)

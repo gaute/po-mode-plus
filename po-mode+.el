@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.1
-;; Last-Updated: Fri Jun 30 16:18:19 2006 (7200 CEST)
+;; Last-Updated: Fri Jun 30 16:22:59 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 41
+;;     Update #: 42
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -29,6 +29,16 @@
 ;;
 ;; You may adjust some variables, below, by defining them in your
 ;; `.emacs' file, either directly or through command 'M-x customize'.
+;;
+;; Installation:
+;;
+;;  Put this file where Emacs can find it, and place the following in
+;;  your `~/.emacs':
+;;
+;;  (autoload 'po-mode "po-mode+"
+;;   "Major mode for translators to edit PO files" t)
+;;
+;;  (Don't load both `po-mode' and `po-mode+', just `po-mode+'.)
 ;;
 ;; Extensions to po-mode:
 ;;

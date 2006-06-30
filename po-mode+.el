@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.1
-;; Last-Updated: Fri Jun 30 16:26:57 2006 (7200 CEST)
+;; Last-Updated: Fri Jun 30 19:30:02 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 43
+;;     Update #: 50
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -44,11 +44,12 @@
 ;;
 ;;  `po-update-header' is a generalization of the function that
 ;;  updates 'PO-Revision-Date'. It now updates 'Last-Translator',
-;;  'Language-Team' and 'X-Generator' too. `po-translator' and
-;;  `po-language-team' are customizable variables.
+;;  'Language-Team' and 'X-Generator' too. `po-translator',
+;;  `po-language-team' and `po-x-generator' are customizable
+;;  variables.
 ;;
-;;  `po-msgid-to-msgstr' is changed so that it ignores the KDE-style
-;;  context comments; lines that begins with '_:' and ends with
+;;  `po-msgid-to-msgstr' is changed so that it ignores KDE-style
+;;  context comments: The first line begins with '_:' and ends with
 ;;  '\n'. These should never appear in the translation.
 ;;
 ;;  `po-subedit-insert-next-tag' and `po-subedit-insert-next-arg' are
@@ -115,7 +116,7 @@ Version number of this version of po-mode+.el.")
 ;; REPLACES ORIGINAL in `po-mode.el'
 ;; Use `po-x-generator'.
 (defun po-mode-version ()
-  "Show Emacs PO mode version."
+  "Show and return Emacs PO mode version."
   (interactive)
   (let ((msg (concat "Emacs " emacs-version 
 		     ", po-mode " po-mode-version-string
@@ -123,8 +124,12 @@ Version number of this version of po-mode+.el.")
     (message msg)
     msg))
 
+;; Replaces `po-replace-revision-date' with `po-update-header' on
+;; `write-contents-hook'.
+;; Adds keybindings.
 (defun po-mode+ ()
   "To be run on `po-mode-hook'."
+  (remove-hook 'write-contents-hooks 'po-replace-revision-date)
   (add-hook 'write-contents-hooks 'po-update-header)
   (define-key po-mode-map "g" 'po-select-entry-number))
 
@@ -340,6 +345,7 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
 
 ;; REPLACES ORIGINAL in `po-mode.el'
 ;; Modified to remove KDE-style context comments before copying.
+;; Fixed a typo, too :-)
 (defun po-msgid-to-msgstr ()
   "Initialize msgstr with msgid."
   (interactive)
@@ -451,7 +457,8 @@ unless there are no entries of the other types."
 		    (setq goal nil))
 		  (goto-char (point-min))
 		  (setq goal 'obsolete)))
-	  ;; Find an obsolete entry, or wrap up for an untranslated entry.
+	  ;; Find an obsolete entry, or wrap up for an untranslated or
+	  ;; fuzzy entry.
 	  (if (eq goal 'obsolete)
 	      (if (and (> po-obsolete-counter 0)
 		       (re-search-forward po-obsolete-msgstr-regexp nil t))
@@ -459,7 +466,7 @@ unless there are no entries of the other types."
 		    (goto-char (match-beginning 0))
 		    (setq goal nil))
 		  (goto-char (point-min))
-		  (setq goal 'untranslated))))))
+		  (setq goal 'untranslated-or-fuzzy))))))
   ;; Display this entry nicely.
   (po-current-entry))
 

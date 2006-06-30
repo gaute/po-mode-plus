@@ -3,12 +3,12 @@
 ;; Filename: po-mode+.el
 ;; Description: Extensions to GNU gettext's `po-mode.el'.
 ;; Author: Gaute Hvoslef Kvalnes <gaute@verdsveven.com>
-;; Copyright (C) 2006, Gaute Hvoslef Kvalnes, all rights reserved.
+;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 29 21:35:47 CEST 2006
 ;; Version: 0.3
-;; Last-Updated: Fri Jun 30 01:33:45 2006 (7200 CEST)
+;; Last-Updated: Fri Jun 30 02:20:18 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 8
+;;     Update #: 18
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -94,7 +94,7 @@ Version number of this version of po-mode+.el.")
 ;; Some Common Lisp macros are used:
 ;;   loop
 (eval-when-compile (require 'cl))
-
+
 ;;; Customisation.
 
 (defcustom po-auto-select-mode 'by-type
@@ -115,7 +115,9 @@ untranslated and fuzzy entries in the same run."
   :group 'po)
 
 (defcustom po-x-generator
-  (concat "Emacs " emacs-version ", po-mode " po-mode-version-string)
+  (concat "Emacs " emacs-version 
+	  ", po-mode " po-mode-version-string
+	  "+" po-mode-+-version-string)
   "*X-Generator header to identify the editor."
   :type 'string
   :group 'po)
@@ -135,20 +137,26 @@ untranslated and fuzzy entries in the same run."
   "*Language name and address of mailing list."
   :type 'string
   :group 'po)
-
+
+
 ;;; Buffer local variables.
 
 ;; The buffer where search results should show up. This is suggested
 ;; to be in a separate frame that is always open.
 (defvar po-search-buffer "*po-search*")
-
+
+
 ;;; PO mode variables and constants (usually not to customize).
 
+;; REPLACES ORIGINAL in `po-mode.el'
+;; Use `po-x-generator'.
 (defun po-mode-version ()
   "Show Emacs PO mode version."
   (interactive)
-  (message (_"Emacs PO mode %s+%s") po-mode-version-string po-mode-+-version-string))
+  (message po-x-generator))
 
+;; REPLACES ORIGINAL in `po-mode.el'
+;; FIXME: Add keys here.
 (defconst po-help-display-string
   (_"\
 PO Mode Summary           Next Previous            Miscellaneous
@@ -177,6 +185,7 @@ M-S  Ignore path          M-A  Ignore PO file      *M-L  Ignore lexicon
 ")
   "Help page for PO mode.")
 
+;; REPLACES ORIGINAL in `po-mode.el'
 (defconst po-mode-menu-layout
   `("PO"
     ("Moving around"
@@ -348,6 +357,9 @@ Initialize or replace current translation with the original message"))])
 	  '(:help "Save current translation file, than close (kill) it"))])
   "Menu layout for PO mode.")
 
+;; REPLACES ORIGINAL in `po-mode.el'
+;; Added `po-subedit-insert-search-result', `po-subedit-insert-next-arg'
+;; and `po-subedit-insert-next-tag'.
 (defconst po-subedit-mode-menu-layout
   `("PO-Edit"
     ["Ediff and merge translation variants" po-subedit-ediff
@@ -365,9 +377,12 @@ Initialize or replace current translation with the original message"))])
      ,@(if (featurep 'xemacs) '(t)
 	 '(:help "Use this text as the translation and close current edit buffer"))])
   "Menu layout for PO subedit mode.")
-
+
+
 ;;; Mode activation.
 
+;; REPLACES ORIGINAL in `po-mode.el'
+;; Added "@", "*" and "g".
 (defvar po-mode-map
   ;; Use (make-keymap) because (make-sparse-keymap) does not work on Demacs.
   (let ((po-mode-map (make-keymap)))
@@ -439,6 +454,8 @@ Initialize or replace current translation with the original message"))])
     po-mode-map)
   "Keymap for PO mode.")
 
+;; REPLACES ORIGINAL in `po-mode.el'
+;; FIXME: Do I need to reimplement this, or can I just use `po-mode-hook'?
 (defun po-mode ()
   "Major mode for translators when they edit PO files.
 
@@ -499,6 +516,8 @@ all reachable through 'M-x customize', in group 'Emacs.Editing.I18n.Po'."
   (run-hooks 'po-mode-hook)
   (message (_"You may type 'h' or '?' for a short PO mode reminder.")))
 
+;; REPLACES ORIGINAL in `po-mode.el'
+;; Added "\C-c*", "\C-c\C-a" and "\C-c\C-n".
 (defvar po-subedit-mode-map
   ;; Use (make-keymap) because (make-sparse-keymap) does not work on Demacs.
   (let ((po-subedit-mode-map (make-keymap)))
@@ -512,9 +531,10 @@ all reachable through 'M-x customize', in group 'Emacs.Editing.I18n.Po'."
     (define-key po-subedit-mode-map "\C-c\C-n" 'po-subedit-insert-next-tag)
     po-subedit-mode-map)
   "Keymap while editing a PO mode entry (or the full PO file).")
-
 
 
+;; REPLACES ORIGINAL in `po-mode.el'
+;; Fixed the fuzzy counter.
 (defun po-compute-counters (flag)
   "Prepare counters for mode line display.  If FLAG, also echo entry position."
   (and flag (po-find-span-of-entry))
@@ -571,7 +591,6 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
   (po-update-mode-line-string))
 
 
-
 ;;; Processing the PO file header entry.
 
 (defmacro po-replace-header-field (condition field replacement)
@@ -611,8 +630,6 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
 	   "Language-Team" po-language-team)
 	  (po-replace-header-field t "X-Generator" po-x-generator)))))
 
-
-;;;
 
 (defun po-remove-context-comment (msg)
   "Removes any KDE-style context comment from MSG."
@@ -620,8 +637,10 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
       (replace-match "" nil nil msg)
       msg))
 
+;; REPLACES ORIGINAL in `po-mode.el'
+;; Remove KDE-style context comments before copying.
 (defun po-msgid-to-msgstr ()
-  "Use another window to edit msgstr reinitialized with msgid."
+  "Initialize msgstr with msgid."
   (interactive)
   (po-find-span-of-entry)
   (if (or (eq po-entry-type 'untranslated)
@@ -632,6 +651,7 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
 
 ;; Auto-selection feature.
 
+;; REPLACES ORIGINAL in `po-mode.el'
 (defun po-auto-select-entry ()
   "Select the next entry according to the workflow preference
 `po-auto-select-mode'."
@@ -646,7 +666,6 @@ If none, wrap from the beginning of the buffer with another type,
 going from untranslated to fuzzy, and from fuzzy to obsolete.
 Plain translated entries are always disregarded unless there are
 no entries of the other types."
-  (interactive)
   (po-find-span-of-entry)
   (goto-char po-end-of-entry)
   (if (and (= po-untranslated-counter 0)
@@ -699,7 +718,6 @@ fuzzy or untranslated entry. Select obsolete entries if there are
 no more fuzzy or untranslated ones, or if an obsolete entry is
 already selected. Plain translated entries are always disregarded
 unless there are no entries of the other types."
-  (interactive)
   (po-find-span-of-entry)
   (goto-char po-end-of-entry)
   (if (and (= po-untranslated-counter 0)
@@ -751,11 +769,12 @@ unless there are no entries of the other types."
   (po-first-entry)
   (loop for i from 1 to num
        do (po-next-entry)))
-
+
+
 ;;; Editing management and submode.
 
-
-
+;; REPLACES ORIGINAL in `po-mode.el'
+;; Added calls to `po-find-args' and `po-find-tags'.
 (defun po-edit-string (string type expand-tabs)
   "Prepare a pop up buffer for editing STRING, which is of a given TYPE.
 TYPE may be 'comment or 'msgstr.  If EXPAND-TABS, expand tabs to spaces.
@@ -853,7 +872,8 @@ Run functions on po-subedit-mode-hook."
   (if po-args-in-msgid
       (insert (pop po-args-in-msgid))
       (error (_"No more arguments."))))
-
+
+
 ;;; Multiple PO files.
 
 (defvar po-base-dir "/Users/gaute/skulelinux/trunk/i18n/openoffice/po/nn/")
@@ -937,7 +957,7 @@ overwriting anything, or is regular undo safe enough?"
     (delete-region (point-min) (point-max))
     (insert replacement)))
 
-
+
 (provide 'po-mode+)
 
 ;;; po-mode+.el ends here

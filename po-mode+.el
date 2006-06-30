@@ -166,11 +166,12 @@ Moving around             f    F    Fuzzy          ?, h  This help
 <    First if any         o    O    Obsolete       =     Current index
 >    Last if any          u    U    Untranslated   0     Other window
 /SPC Auto select                                   V     Validate
-                        Msgstr Comments            M     Mail officially
-Modifying entries         RET  #    Call editor    _     Undo
-TAB   Remove fuzzy mark   k    K    Kill to        E     Edit out full
-DEL   Fuzzy or fade out   w    W    Copy to        Q     Forceful quit
-LFD   Init with msgid     y    Y    Yank from      q     Confirm and quit
+g    Entry number                                  M     Mail officially
+                        Msgstr Comments            _     Undo
+Modifying entries         RET  #    Call editor    E     Edit out full
+TAB   Remove fuzzy mark   k    K    Kill to        Q     Forceful quit
+DEL   Fuzzy or fade out   w    W    Copy to        q     Confirm and quit
+LFD   Init with msgid     y    Y    Yank from      
 
 gettext Keyword Marking                            Position Stack
 ,    Find next string     Compendiums              m  Mark and push current

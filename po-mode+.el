@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 29 21:35:47 CEST 2006
 ;; Version: 0.1
-;; Last-Updated: Fri Jun 30 15:47:46 2006 (7200 CEST)
+;; Last-Updated: Fri Jun 30 16:07:16 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 33
+;;     Update #: 36
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -66,6 +66,13 @@
 ;;  msgfmt. (I've never seen fuzzy+untranslated entries, but a FIXME
 ;;  comment in the source code warned against it. Fuzzy+obsolete
 ;;  entries happens all the time, at least in the projects I work on.)
+;;
+;; Bugs introduced:
+;;
+;;  The customizable variable `po-auto-replace-revision-date' is now
+;;  meaningless, being replaced by the more general
+;;  `po-auto-update-header'. I don't know how to remove it without
+;;  editing `po-mode.el'.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;

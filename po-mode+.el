@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 29 21:35:47 CEST 2006
 ;; Version: 0.1
-;; Last-Updated: Fri Jun 30 14:56:27 2006 (7200 CEST)
+;; Last-Updated: Fri Jun 30 15:13:11 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 21
+;;     Update #: 23
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -211,7 +211,7 @@ M-S  Ignore path          M-A  Ignore PO file      *M-L  Ignore lexicon
 ;;; Mode activation.
 
 ;; REPLACES ORIGINAL in `po-mode.el'
-;; Added "@", "*" and "g".
+;; Added "g".
 (defvar po-mode-map
   ;; Use (make-keymap) because (make-sparse-keymap) does not work on Demacs.
   (let ((po-mode-map (make-keymap)))
@@ -227,10 +227,6 @@ M-S  Ignore path          M-A  Ignore PO file      *M-L  Ignore lexicon
     (define-key po-mode-map "<" 'po-first-entry)
     (define-key po-mode-map "=" 'po-statistics)
     (define-key po-mode-map ">" 'po-last-entry)
-    ;; FIXME: The following two are probably only useful on Norwegian
-    ;; Mac keyboards :-)
-    (define-key po-mode-map "@" 'po-search)
-    (define-key po-mode-map "*" 'po-copy-search-to-msgstr)
     (define-key po-mode-map "a" 'po-cycle-auxiliary)
 ;;;;  (define-key po-mode-map "c" 'po-save-entry)
     (define-key po-mode-map "f" 'po-next-fuzzy-entry)

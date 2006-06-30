@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 29 21:35:47 CEST 2006
 ;; Version: 0.1
-;; Last-Updated: Fri Jun 30 15:13:11 2006 (7200 CEST)
+;; Last-Updated: Fri Jun 30 15:31:41 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 23
+;;     Update #: 25
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -91,6 +91,17 @@
 (defconst po-mode-+-version-string "0.1" "\
 Version number of this version of po-mode+.el.")
 
+;; REPLACES ORIGINAL in `po-mode.el'
+;; Use `po-x-generator'.
+(defun po-mode-version ()
+  "Show Emacs PO mode version."
+  (interactive)
+  (let ((msg (concat "Emacs " emacs-version 
+		     ", po-mode " po-mode-version-string
+		     "+" po-mode-+-version-string)))
+    (message msg)
+    msg))
+
 ;; Some Common Lisp macros are used:
 ;;   loop
 (eval-when-compile (require 'cl))
@@ -114,10 +125,7 @@ untranslated and fuzzy entries in the same run."
 		 (const ask))
   :group 'po)
 
-(defcustom po-x-generator
-  (concat "Emacs " emacs-version 
-	  ", po-mode " po-mode-version-string
-	  "+" po-mode-+-version-string)
+(defcustom po-x-generator (po-mode-version)
   "*X-Generator header to identify the editor."
   :type 'string
   :group 'po)
@@ -141,19 +149,7 @@ untranslated and fuzzy entries in the same run."
 
 ;;; Buffer local variables.
 
-;; The buffer where search results should show up. This is suggested
-;; to be in a separate frame that is always open.
-(defvar po-search-buffer "*po-search*")
-
-
 ;;; PO mode variables and constants (usually not to customize).
-
-;; REPLACES ORIGINAL in `po-mode.el'
-;; Use `po-x-generator'.
-(defun po-mode-version ()
-  "Show Emacs PO mode version."
-  (interactive)
-  (message po-x-generator))
 
 ;; REPLACES ORIGINAL in `po-mode.el'
 ;; FIXME: Add keys here.
@@ -281,6 +277,7 @@ M-S  Ignore path          M-A  Ignore PO file      *M-L  Ignore lexicon
 
 ;; REPLACES ORIGINAL in `po-mode.el'
 ;; FIXME: Do I need to reimplement this, or can I just use `po-mode-hook'?
+;; Added 
 (defun po-mode ()
   "Major mode for translators when they edit PO files.
 

@@ -463,9 +463,10 @@ unless there are no entries of the other types."
 (defun po-select-entry-number (num)
   "Go to entry number NUM."
   (interactive "nEntry number: ")
-  (po-first-entry)
   (loop for i from 1 to num
-       do (po-next-entry)))
+       initially (po-first-entry)
+       do (po-next-entry)
+       finally (po-current-entry)))
 
 
 ;;; Editing management and submode.

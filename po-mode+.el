@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.1
-;; Last-Updated: Fri Jun 30 19:30:02 2006 (7200 CEST)
+;; Last-Updated: Sat Jul  1 13:49:26 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 50
+;;     Update #: 54
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -131,7 +131,9 @@ Version number of this version of po-mode+.el.")
   "To be run on `po-mode-hook'."
   (remove-hook 'write-contents-hooks 'po-replace-revision-date)
   (add-hook 'write-contents-hooks 'po-update-header)
-  (define-key po-mode-map "g" 'po-select-entry-number))
+  (define-key po-mode-map "g" 'po-select-entry-number)
+  (define-key po-subedit-mode-map "\C-c\C-a" 'po-subedit-insert-next-arg)
+  (define-key po-subedit-mode-map "\C-c\C-t" 'po-subedit-insert-next-tag))
 
 (add-hook 'po-mode-hook 'po-mode+)
 
@@ -224,20 +226,6 @@ M-S  Ignore path          M-A  Ignore PO file      *M-L  Ignore lexicon
      ,@(if (featurep 'xemacs) '(t)
 	 '(:help "Use this text as the translation and close current edit buffer"))])
   "Menu layout for PO subedit mode.")
-
-;; REPLACES ORIGINAL in `po-mode.el'
-;; Added "\C-c\C-a" and "\C-c\C-n".
-(defvar po-subedit-mode-map
-  ;; Use (make-keymap) because (make-sparse-keymap) does not work on Demacs.
-  (let ((po-subedit-mode-map (make-keymap)))
-    (define-key po-subedit-mode-map "\C-c\C-a" 'po-subedit-cycle-auxiliary)
-    (define-key po-subedit-mode-map "\C-c\C-c" 'po-subedit-exit)
-    (define-key po-subedit-mode-map "\C-c\C-e" 'po-subedit-ediff)
-    (define-key po-subedit-mode-map "\C-c\C-k" 'po-subedit-abort)
-    (define-key po-subedit-mode-map "\C-c\C-a" 'po-subedit-insert-next-arg)
-    (define-key po-subedit-mode-map "\C-c\C-t" 'po-subedit-insert-next-tag)
-    po-subedit-mode-map)
-  "Keymap while editing a PO mode entry (or the full PO file).")
 
 
 ;; REPLACES ORIGINAL in `po-mode.el'

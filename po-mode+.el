@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.2
-;; Last-Updated: Sat Jul  1 18:20:05 2006 (7200 CEST)
+;; Last-Updated: Sat Jul  1 18:25:49 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 57
+;;     Update #: 58
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -477,7 +477,6 @@ unless there are no entries of the other types."
   "Prepare a pop up buffer for editing STRING, which is of a given TYPE.
 TYPE may be 'comment or 'msgstr.  If EXPAND-TABS, expand tabs to spaces.
 Run functions on po-subedit-mode-hook."
-  (run-hooks 'po-before-subedit-mode-hook)
   (let ((marker (make-marker)))
     (set-marker marker (cond ((eq type 'comment) po-start-of-msgid)
 			     ((eq type 'msgstr) po-start-of-msgstr)))

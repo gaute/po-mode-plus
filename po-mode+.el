@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.2
-;; Last-Updated: Sat Jul  1 13:50:56 2006 (7200 CEST)
+;; Last-Updated: Sat Jul  1 18:20:05 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 55
+;;     Update #: 57
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -83,7 +83,9 @@
 ;;  The customizable variable `po-auto-replace-revision-date' is now
 ;;  meaningless, being replaced by the more general
 ;;  `po-auto-update-header'. I don't know how to remove it without
-;;  editing `po-mode.el'.
+;;  editing `po-mode.el'. Perhaps it should be kept, made into a
+;;  non-customizable variable? The way I do it now overrides the old
+;;  preference.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;

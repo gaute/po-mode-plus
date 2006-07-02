@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.2
-;; Last-Updated: Sun Jul  2 18:10:00 2006 (7200 CEST)
+;; Last-Updated: Sun Jul  2 18:15:33 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 70
+;;     Update #: 72
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -303,16 +303,12 @@ If ADD is t, add the field if it's missing."
 	     (concat "\"" field ": " new-value "\\n\"")
 	     t t))
 	  (when add
-	    ;; BUG: When I delete the X-Generator line, the encoding
-	    ;; changes, but not when Last-Translator and Language-Team are
-	    ;; deleted.
-	    (po-set-msgstr
-	     (concat (po-get-msgstr nil)
-		     field ": " new-value "\n"))))))
+	    (let ((buffer-read-only po-read-only))
+	      (goto-char po-end-of-entry)
+	      (insert (concat "\"" field ": " new-value "\\n\"\n")))))))
 
 (defun po-update-header ()
   "Update fields in the PO file header."
-  (interactive)
   (if (or (eq po-auto-update-header t)
 	  (and (eq po-auto-update-header 'ask)
 	       (y-or-n-p (_"May I update the header? "))))
@@ -327,14 +323,10 @@ If ADD is t, add the field if it's missing."
 	  (when (fboundp 'format-time-string)
 	    (po-replace-header-field
 	     "PO-Revision-Date"
-	     (concat (format-time-string "%Y-%m-%d %H:%M" time) zone)))
-	  ;; BUG: If the *last* of the following fields is missing and
-	  ;; gets inserted, the file encoding changes to
-	  ;; mac-roman-mac. This happens only when the function is run
-	  ;; on saving, not interactively.
-	  (po-replace-header-field "X-Generator" po-x-generator t)
+	     (concat (format-time-string "%Y-%m-%d %H:%M" time) zone) t))
 	  (po-replace-header-field "Last-Translator" po-translator t)
-	  (po-replace-header-field "Language-Team" po-language-team t)))))
+	  (po-replace-header-field "Language-Team" po-language-team t)
+	  (po-replace-header-field "X-Generator" po-x-generator t)))))
 
 (defun po-remove-context-comment (msg)
   "Removes any KDE-style context comment from MSG."

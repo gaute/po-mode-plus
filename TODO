@@ -6,6 +6,11 @@
   other kinds of searches as well. Easy copying to the msgstr is a
   must.
 
+  - Remember to make something for terminal users, too.
+
+  - It would be nice to be able to edit the matching string in the
+    auxiliary file.
+
 - Search and replace in the entire file.
 
 - Ignore certain characters when searching. (accelerators & ~)
@@ -14,13 +19,6 @@
   to have it both in the main buffer and in the subedit. For example,
   the final "<" character should be toned down.
 
-- String numbering. Since po-mode does not keep a string index, and
-  since there's many different ways of navigating the file, this could
-  be quite difficult.
-
-  - po-statistics (=) will do for now.
-
-- Goto string number X.
-
 - Nicer look. Uneditable parts can be toned down, and a proportional
-  font can be used. I'd like this to be an option.
+  font can be used. (Compared KBabel, po-mode seems to waste a lot of
+  screen space.) This should be an option.

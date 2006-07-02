@@ -296,16 +296,16 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
 If ADD is t, add the field if it's missing."
   (goto-char (point-min))
   (po-find-span-of-entry)
-  (if (string-equal (po-get-msgid nil) "")
-      (if (re-search-forward (concat "^\"" field ":.*") po-end-of-entry t)
+  (when (string-equal (po-get-msgid nil) "")
+    (if (re-search-forward (concat "^\"" field ":.*") po-end-of-entry t)
+	(let ((buffer-read-only po-read-only))
+	  (replace-match
+	   (concat "\"" field ": " new-value "\\n\"")
+	   t t))
+	(when add
 	  (let ((buffer-read-only po-read-only))
-	    (replace-match
-	     (concat "\"" field ": " new-value "\\n\"")
-	     t t))
-	  (when add
-	    (let ((buffer-read-only po-read-only))
-	      (goto-char po-end-of-entry)
-	      (insert (concat "\"" field ": " new-value "\\n\"\n")))))))
+	    (goto-char po-end-of-entry)
+	    (insert (concat "\"" field ": " new-value "\\n\"\n")))))))
 
 (defun po-update-header ()
   "Update fields in the PO file header."

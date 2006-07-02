@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.2
-;; Last-Updated: Sun Jul  2 18:15:33 2006 (7200 CEST)
+;; Last-Updated: Sun Jul  2 18:35:14 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 72
+;;     Update #: 73
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -112,7 +112,7 @@
 ;;   case loop
 (eval-when-compile (require 'cl))
 
-(defconst po-mode-+-version-string "0.2" "\
+(defconst po-mode+-version-string "0.2" "\
 Version number of this version of po-mode+.el.")
 
 ;; REPLACES ORIGINAL in `po-mode.el'
@@ -122,7 +122,7 @@ Version number of this version of po-mode+.el.")
   (interactive)
   (let ((msg (concat "Emacs " emacs-version 
 		     ", po-mode " po-mode-version-string
-		     "+" po-mode-+-version-string)))
+		     "+" po-mode+-version-string)))
     (message msg)
     msg))
 

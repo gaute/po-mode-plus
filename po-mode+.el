@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.2
-;; Last-Updated: Sun Jul  2 18:35:14 2006 (7200 CEST)
+;; Last-Updated: Sun Jul  2 18:42:23 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 73
+;;     Update #: 75
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -392,50 +392,52 @@ no entries of the other types."
 				   'obsolete
 				   'untranslated-or-fuzzy)))))
 	(while goal
-	  ;; Find an untranslated entry, or wrap up for a fuzzy entry.
-	  (if (eq goal 'untranslated)
-	      (if (and (> po-untranslated-counter 0)
-		       (re-search-forward po-untranslated-regexp nil t))
-		  (progn
-		    (goto-char (match-beginning 0))
-		    (setq goal nil))
-		  (goto-char (point-min))
-		  (setq goal 'fuzzy)))
-	  ;; Find a fuzzy entry, or wrap up for an obsolete entry.
-	  (if (eq goal 'fuzzy)
-	      (if (and (> po-fuzzy-counter 0)
-		       (re-search-forward po-fuzzy-regexp nil t))
-		  (progn
-		    (goto-char (match-beginning 0))
-		    (setq goal nil))
-		  (goto-char (point-min))
-		  (setq goal 'obsolete)))
-	  ;; Find an untranslated or fuzzy entry, or wrap up for an
-	  ;; obsolete entry.
-	  (if (eq goal 'untranslated-or-fuzzy)
-	      (if (and (or (> po-fuzzy-counter 0)
-			   (> po-untranslated-counter 0))
-		       (re-search-forward 
-			(format "\\(%s\\|%s\\)" 
-				po-fuzzy-regexp
-				po-untranslated-regexp)
-			nil t))
-		  (progn
-		    (goto-char (match-beginning 0))
-		    (setq goal nil))
-		  (goto-char (point-min))
-		  (setq goal 'obsolete)))
-	  ;; Find an obsolete entry, or wrap up for an untranslated entry.
-	  (if (eq goal 'obsolete)
-	      (if (and (> po-obsolete-counter 0)
-		       (re-search-forward po-obsolete-msgstr-regexp nil t))
-		  (progn
-		    (goto-char (match-beginning 0))
-		    (setq goal nil))
-		  (goto-char (point-min))
-		  (if (eq 'po-auto-select-mode 'by-type)
-		      (setq goal 'untranslated)
-		      (setq goal 'untranslated-or-fuzzy)))))))
+	  (case goal
+	    ('untranslated
+	     ;; Find an untranslated entry, or wrap up for a fuzzy entry.
+	     (if (and (> po-untranslated-counter 0)
+		      (re-search-forward po-untranslated-regexp nil t))
+		 (progn
+		   (goto-char (match-beginning 0))
+		   (setq goal nil))
+		 (goto-char (point-min))
+		 (setq goal 'fuzzy)))
+	    ('fuzzy
+	     ;; Find a fuzzy entry, or wrap up for an obsolete entry.
+	     (if (and (> po-fuzzy-counter 0)
+		      (re-search-forward po-fuzzy-regexp nil t))
+		 (progn
+		   (goto-char (match-beginning 0))
+		   (setq goal nil))
+		 (goto-char (point-min))
+		 (setq goal 'obsolete)))
+	    ('untranslated-or-fuzzy
+	     ;; Find an untranslated or fuzzy entry, or wrap up for an
+	     ;; obsolete entry.
+	     (if (and (or (> po-fuzzy-counter 0)
+			  (> po-untranslated-counter 0))
+		      (re-search-forward 
+		       (format "\\(%s\\|%s\\)" 
+			       po-fuzzy-regexp
+			       po-untranslated-regexp)
+		       nil t))
+		 (progn
+		   (goto-char (match-beginning 0))
+		   (setq goal nil))
+		 (goto-char (point-min))
+		 (setq goal 'obsolete)))
+	    ('obsolete
+	     ;; Find an obsolete entry, or wrap up for an untranslated entry.
+	     (if (and (> po-obsolete-counter 0)
+		      (re-search-forward po-obsolete-msgstr-regexp nil t))
+		 (progn
+		   (goto-char (match-beginning 0))
+		   (setq goal nil))
+		 (goto-char (point-min))
+		 (if (eq 'po-auto-select-mode 'by-type)
+		     (setq goal 'untranslated)
+		     (setq goal 'untranslated-or-fuzzy))))
+	    (t (error (_"Unknown entry type")))))))
   ;; Display this entry nicely.
   (po-current-entry))
 

@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.2
-;; Last-Updated: Sun Jul  2 14:21:22 2006 (7200 CEST)
+;; Last-Updated: Sun Jul  2 18:10:00 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 63
+;;     Update #: 70
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -291,17 +291,28 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
 ;;; Processing the PO file header entry.
 ;; This replaces `po-replace-revision-date'.
 
-(defun po-replace-header-field (field new-value)
-  "Replace the value of header field FIELD with NEW-VALUE."
+(defun po-replace-header-field (field new-value &optional add)
+  "Replace the value of header field FIELD with NEW-VALUE. 
+If ADD is t, add the field if it's missing."
   (goto-char (point-min))
-  (if (re-search-forward (concat "^\"" field ":.*") nil t)
-      (let ((buffer-read-only po-read-only))
-	(replace-match
-	 (concat "\"" field ": " new-value "\\n\"")
-	 t t))))
+  (po-find-span-of-entry)
+  (if (string-equal (po-get-msgid nil) "")
+      (if (re-search-forward (concat "^\"" field ":.*") po-end-of-entry t)
+	  (let ((buffer-read-only po-read-only))
+	    (replace-match
+	     (concat "\"" field ": " new-value "\\n\"")
+	     t t))
+	  (when add
+	    ;; BUG: When I delete the X-Generator line, the encoding
+	    ;; changes, but not when Last-Translator and Language-Team are
+	    ;; deleted.
+	    (po-set-msgstr
+	     (concat (po-get-msgstr nil)
+		     field ": " new-value "\n"))))))
 
 (defun po-update-header ()
   "Update fields in the PO file header."
+  (interactive)
   (if (or (eq po-auto-update-header t)
 	  (and (eq po-auto-update-header 'ask)
 	       (y-or-n-p (_"May I update the header? "))))
@@ -317,11 +328,13 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
 	    (po-replace-header-field
 	     "PO-Revision-Date"
 	     (concat (format-time-string "%Y-%m-%d %H:%M" time) zone)))
-	  (unless (equal po-translator po-translator-default)
-	    (po-replace-header-field "Last-Translator" po-translator))
-	  (unless (equal po-language-team po-language-team-default)
-	    (po-replace-header-field "Language-Team" po-language-team))
-	  (po-replace-header-field "X-Generator" po-x-generator)))))
+	  ;; BUG: If the *last* of the following fields is missing and
+	  ;; gets inserted, the file encoding changes to
+	  ;; mac-roman-mac. This happens only when the function is run
+	  ;; on saving, not interactively.
+	  (po-replace-header-field "X-Generator" po-x-generator t)
+	  (po-replace-header-field "Last-Translator" po-translator t)
+	  (po-replace-header-field "Language-Team" po-language-team t)))))
 
 (defun po-remove-context-comment (msg)
   "Removes any KDE-style context comment from MSG."

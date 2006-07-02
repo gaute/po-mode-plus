@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.2
-;; Last-Updated: Sun Jul  2 18:42:23 2006 (7200 CEST)
+;; Last-Updated: Sun Jul  2 21:12:47 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 75
+;;     Update #: 81
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -46,7 +46,8 @@
 ;;  updates 'PO-Revision-Date'. It now updates 'Last-Translator',
 ;;  'Language-Team' and 'X-Generator' too. `po-translator',
 ;;  `po-language-team' and `po-x-generator' are customizable
-;;  variables.
+;;  variables. The function will insert fields that don't already
+;;  exist.
 ;;
 ;;  `po-msgid-to-msgstr' is changed so that it ignores KDE-style
 ;;  context comments: The first line begins with '_:' and ends with
@@ -109,14 +110,15 @@
 (require 'po-mode)
 
 ;; Some Common Lisp macros are used:
-;;   case loop
+;;   case loop pop
 (eval-when-compile (require 'cl))
 
 (defconst po-mode+-version-string "0.2" "\
 Version number of this version of po-mode+.el.")
 
 ;; REPLACES ORIGINAL in `po-mode.el'
-;; Use `po-x-generator'.
+;; Added emacs-version and po-mode+-version-string.
+;; Now returns the string, to be used in the 'X-Generator' header.
 (defun po-mode-version ()
   "Show and return Emacs PO mode version."
   (interactive)
@@ -506,27 +508,27 @@ Run functions on po-subedit-mode-hook."
 (defvar po-xml-tags-in-msgid '()
   "List of XML tags in a msgid, found by `po-find-xml-tags'.")
 
-(defvar po-xml-tag-regexp "\\(<[^>]+>\\|&[a-z]+;\\)"
-  "Matches XML tags and entities.")
-
-(defun po-find-xml-tags (msgid)
-  "Find any XML tags in msgid and put them in `po-xml-tags-in-msg'."
-  (setq po-xml-tags-in-msgid (po-find-matches msgid po-xml-tag-regexp)))
-
 (defvar po-args-in-msgid '()
   "List of arguments in a msgid, found by `po-find-args'.")
 
+(defvar po-xml-tag-regexp "\\(<[^>]+>\\|&[a-z]+;\\)"
+  "Matches XML tags and entities.")
+
 (defvar po-args-regexp "\\(%[-+# ]?[0-9*]+?\\(\\.[0-9*]\\)?[hlL]?[cdieEfgGosuxXpn]\\|%L?[0-9]\\|\\$\\[[a-z]+\\]\\|%[A-Z_]+\\|\\$[a-z_]+\\$\\)"
-  "Matches various argument types.
+  "Matches various argument types:
    %[-+ #]?[0-9*]?\\(\\.[0-9*]\\)?[hlL]?[cdieEfgGosuxXpn]
                               C-style printf arguments
-   %L?[0-9]             %1      Qt
+   %L?[0-9]           %1      Qt
    \\$[[a-z]+]         $[arg]  OpenOffice.org
    %[A-Z_]            %ARG    OpenOffice.org
    \\$[a-z_]+]\\$       $arg$   OpenOffice.org")
 
+(defun po-find-xml-tags (msgid)
+  "Find any XML tags in MSGID and put them in `po-xml-tags-in-msg'."
+  (setq po-xml-tags-in-msgid (po-find-matches msgid po-xml-tag-regexp)))
+
 (defun po-find-args (msgid)
-  "Find any arguments in msgid and put them in `po-args-in-msg'."
+  "Find any arguments in MSGID and put them in `po-args-in-msg'."
   (setq po-args-in-msgid (po-find-matches msgid po-args-regexp)))
 
 (defun po-find-matches (s regexp)

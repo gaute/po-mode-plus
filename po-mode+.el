@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.2
-;; Last-Updated: Sun Jul  2 09:54:43 2006 (7200 CEST)
+;; Last-Updated: Sun Jul  2 14:21:22 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 60
+;;     Update #: 63
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -291,16 +291,14 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
 ;;; Processing the PO file header entry.
 ;; This replaces `po-replace-revision-date'.
 
-(defmacro po-replace-header-field (condition field replacement)
-  "Replace a header field."
-  `(if ,condition
-       (save-excursion
-	 (goto-char (point-min))
-	 (if (re-search-forward (concat "^\"" ,field ":.*") nil t)
-	     (let ((buffer-read-only po-read-only))
-	       (replace-match
-		(concat "\"" ,field ": " ,replacement "\\n\"")
-		t t))))))
+(defun po-replace-header-field (field new-value)
+  "Replace the value of header field FIELD with NEW-VALUE."
+  (goto-char (point-min))
+  (if (re-search-forward (concat "^\"" field ":.*") nil t)
+      (let ((buffer-read-only po-read-only))
+	(replace-match
+	 (concat "\"" field ": " new-value "\\n\"")
+	 t t))))
 
 (defun po-update-header ()
   "Update fields in the PO file header."
@@ -315,17 +313,15 @@ Position %d/%d; %d translated, %d fuzzy, %d untranslated, %d obsolete")
 			     (if (< seconds 0) ?- ?+)
 			     (/ minutes 60)
 			     (% minutes 60))))
-	  (po-replace-header-field 
-	   (fboundp 'format-time-string)
-	   "PO-Revision-Date"
-	   (concat (format-time-string "%Y-%m-%d %H:%M" time) zone))
-	  (po-replace-header-field
-	   (not (equal po-translator po-translator-default))
-	   "Last-Translator" po-translator)
-	  (po-replace-header-field
-	   (not (equal po-language-team po-language-team-default))
-	   "Language-Team" po-language-team)
-	  (po-replace-header-field t "X-Generator" po-x-generator)))))
+	  (when (fboundp 'format-time-string)
+	    (po-replace-header-field
+	     "PO-Revision-Date"
+	     (concat (format-time-string "%Y-%m-%d %H:%M" time) zone)))
+	  (unless (equal po-translator po-translator-default)
+	    (po-replace-header-field "Last-Translator" po-translator))
+	  (unless (equal po-language-team po-language-team-default)
+	    (po-replace-header-field "Language-Team" po-language-team))
+	  (po-replace-header-field "X-Generator" po-x-generator)))))
 
 (defun po-remove-context-comment (msg)
   "Removes any KDE-style context comment from MSG."

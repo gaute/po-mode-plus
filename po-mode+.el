@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.2
-;; Last-Updated: Sun Jul  2 21:12:47 2006 (7200 CEST)
+;; Last-Updated: Mon Jul  3 19:49:24 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 81
+;;     Update #: 97
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -68,6 +68,15 @@
 ;;
 ;;  `po-select-entry-number' is bound to 'g'. It asks for an entry
 ;;  number and selects it.
+;;
+;;  `po-find-msg' searches for a message containing a string. The
+;;  pattern in `po-ignore-in-search' defines characters to ignore.
+;;  This is useful for accelerators, which are typically marked by '&'
+;;  or '~'.
+;;
+;;  `po-replace-in-msgstrs' is a function that replaces a string with
+;;  another in all the msgstrs from the current point to the end of
+;;  the file.
 ;;
 ;; Bugfixes to po-mode:
 ;;
@@ -136,6 +145,8 @@ Version number of this version of po-mode+.el.")
   (remove-hook 'write-contents-hooks 'po-replace-revision-date)
   (add-hook 'write-contents-hooks 'po-update-header)
   (define-key po-mode-map "g" 'po-select-entry-number)
+  (define-key po-mode-map "\C-c\C-s" 'po-find-msg)
+  (define-key po-mode-map "\C-c\C-r" 'po-replace-in-msgstrs)
   (define-key po-subedit-mode-map "\C-c\C-a" 'po-subedit-insert-next-arg)
   (define-key po-subedit-mode-map "\C-c\C-t" 'po-subedit-insert-next-tag))
 
@@ -542,14 +553,46 @@ Run functions on po-subedit-mode-hook."
   (interactive)
   (if po-xml-tags-in-msgid
       (insert (pop po-xml-tags-in-msgid))
-      (error (_"No more tags."))))
+      (error (_"No more tags"))))
 
 (defun po-subedit-insert-next-arg ()
   "Insert the next argument that occurs in the msgid."
   (interactive)
   (if po-args-in-msgid
       (insert (pop po-args-in-msgid))
-      (error (_"No more arguments."))))
+      (error (_"No more arguments"))))
+
+
+;;; Search and replace.
+
+(defvar po-ignore-in-search "[&~]"
+  "Regexp to ignore when searching, inserted between every
+  character. (Useful for accelerators.)")
+
+(defun po-add-ignores (s)
+  "Returns S with the ignore pattern `po-ignore-in-search' added
+between every character."
+  (interactive "s")
+  (cond ((eql (length s) 0) s)
+	(t (concat "\\(" po-ignore-in-search "\\)?" (substring s 0 1)
+		   (po-add-ignores (substring s 1))))))
+
+(defun po-find-msg (s)
+  "Find an entry containing S, ignoring `po-ignore-in-search'."
+  (interactive "sFind: ")
+  (po-next-entry-with-regexp (po-add-ignores s) t))
+
+(defun po-replace-in-msgstrs (s r)
+  "Replace S by R in all msgstrs. Preserves capitalization. (We
+cannot ignore characters here, since we don't know where to
+insert them again.)"
+  (interactive "sFind: \nsReplace with: ")
+  (while (re-search-forward s nil t)
+    ;; `po-next-entry-with-regexp' may find matches outside the
+    ;; msgstr, but `po-set-msgstr' does nothing in those cases.
+    (po-find-span-of-entry)
+    (po-set-msgstr (replace-regexp-in-string s r (po-get-msgstr nil)))
+    (po-current-entry)))
 
 (provide 'po-mode+)
 

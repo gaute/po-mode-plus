@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.3
-;; Last-Updated: Mon Jul  3 21:35:28 2006 (7200 CEST)
+;; Last-Updated: Mon Jul  3 21:39:08 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 101
+;;     Update #: 102
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -69,14 +69,22 @@
 ;;  `po-select-entry-number' is bound to 'g'. It asks for an entry
 ;;  number and selects it.
 ;;
-;;  `po-find-msg' searches for a message containing a string. The
-;;  pattern in `po-ignore-in-search' defines characters to ignore.
-;;  This is useful for accelerators, which are typically marked by '&'
-;;  or '~'.
+;;  `po-find-msg' (C-c C-m) searches for a message containing a
+;;  string. The pattern in `po-ignore-in-search' defines characters to
+;;  ignore.  This is useful for accelerators, which are typically
+;;  marked by '&' or '~'.
 ;;
-;;  `po-replace-in-msgstrs' is a function that replaces a string with
-;;  another in all the msgstrs from the current point to the end of
-;;  the file.
+;;  `po-find-msgstr' (C-c C-s) searches for a message where the msgstr
+;;  contains a string. The pattern in `po-ignore-in-search' defines
+;;  characters to ignore.
+;;
+;;  `po-find-msgid' (C-c C-i) searches for a message where the msgid
+;;  contains a string. The pattern in `po-ignore-in-search' defines
+;;  characters to ignore.
+;;
+;;  `po-replace-in-msgstrs' (C-c C-r) is a function that replaces a
+;;  string with another in all the msgstrs from the current point to
+;;  the end of the file.
 ;;
 ;; Bugfixes to po-mode:
 ;;
@@ -145,7 +153,9 @@
   (remove-hook 'write-contents-hooks 'po-replace-revision-date)
   (add-hook 'write-contents-hooks 'po-update-header)
   (define-key po-mode-map "g" 'po-select-entry-number)
-  (define-key po-mode-map "\C-c\C-s" 'po-find-msg)
+  (define-key po-mode-map "\C-c\C-m" 'po-find-msg)
+  (define-key po-mode-map "\C-c\C-s" 'po-find-msgstr)
+  (define-key po-mode-map "\C-c\C-i" 'po-find-msgid)
   (define-key po-mode-map "\C-c\C-r" 'po-replace-in-msgstrs)
   (define-key po-subedit-mode-map "\C-c\C-a" 'po-subedit-insert-next-arg)
   (define-key po-subedit-mode-map "\C-c\C-t" 'po-subedit-insert-next-tag))
@@ -582,14 +592,32 @@ between every character."
   (interactive "sFind: ")
   (po-next-entry-with-regexp (po-add-ignores s) t))
 
+(defun po-find-msgstr (s)
+  "Find a msgstr containing S, starting from the current
+position, ignoring `po-ignore-in-search'."
+  (interactive "sFind: ")
+  (loop for msgstr = (progn (po-next-entry)
+			    (po-find-span-of-entry)
+			    (po-get-msgstr nil))
+     until (string-match (po-add-ignores s) msgstr)))
+
+(defun po-find-msgid (s)
+  "Find a msgid containing S, starting from the current
+position, ignoring `po-ignore-in-search'."
+  (interactive "sFind: ")
+  (loop for msgid = (progn (po-next-entry)
+			   (po-find-span-of-entry)
+			   (po-get-msgid nil))
+     until (string-match (po-add-ignores s) msgid)))
+
 (defun po-replace-in-msgstrs (s r)
   "Replace S by R in all msgstrs. Preserves capitalization. (We
 cannot ignore characters here, since we don't know where to
 insert them again.)"
   (interactive "sFind: \nsReplace with: ")
   (while (re-search-forward s nil t)
-    ;; `po-next-entry-with-regexp' may find matches outside the
-    ;; msgstr, but `po-set-msgstr' does nothing in those cases.
+    ;; `re-search-forward' may find matches outside the msgstr, but
+    ;; `po-set-msgstr' does nothing in those cases.
     (po-find-span-of-entry)
     (po-set-msgstr (replace-regexp-in-string s r (po-get-msgstr nil)))
     (po-current-entry)))

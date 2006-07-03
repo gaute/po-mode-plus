@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.3
-;; Last-Updated: Mon Jul  3 21:39:08 2006 (7200 CEST)
+;; Last-Updated: Mon Jul  3 23:35:23 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 102
+;;     Update #: 105
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -22,7 +22,7 @@
 ;;; Commentary:
 ;;
 ;; This package is an extension to `po-mode.el', GNU Gettext's major
-;; mode for editing PO files.
+;; mode for editing PO files. It is made for po-mode version 2.01.
 ;;
 ;; Although this is written, tested and used in Emacs 22.x, it might
 ;; work in other versions too.

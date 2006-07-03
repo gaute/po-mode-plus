@@ -5,10 +5,10 @@
 ;; Author: Gaute Hvoslef Kvalnes <gaute@verdsveven.com>
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
-;; Version: 0.2
-;; Last-Updated: Mon Jul  3 19:49:24 2006 (7200 CEST)
+;; Version: 0.3
+;; Last-Updated: Mon Jul  3 21:35:28 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 97
+;;     Update #: 101
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -122,8 +122,8 @@
 ;;   case loop pop
 (eval-when-compile (require 'cl))
 
-(defconst po-mode+-version-string "0.2" "\
-Version number of this version of po-mode+.el.")
+(defconst po-mode+-version-string "0.3" 
+  "Version number of this version of po-mode+.el.")
 
 ;; REPLACES ORIGINAL in `po-mode.el'
 ;; Added emacs-version and po-mode+-version-string.

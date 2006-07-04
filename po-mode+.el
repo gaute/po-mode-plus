@@ -24,7 +24,7 @@
 ;; This package is an extension to `po-mode.el', GNU Gettext's major
 ;; mode for editing PO files. It is made for po-mode version 2.01.
 ;;
-;; Although this is written, tested and used in Emacs 22.x, it might
+;; Although written, tested and used in Emacs 22.x, po-mode+ might
 ;; work in other versions too.
 ;;
 ;; You may adjust some variables, below, by defining them in your
@@ -38,7 +38,8 @@
 ;;  (autoload 'po-mode "po-mode+"
 ;;   "Major mode for translators to edit PO files" t)
 ;;
-;;  (Don't load both `po-mode' and `po-mode+', just `po-mode+'.)
+;;  Make sure `po-mode.el' is available for Emacs, but don't load it
+;;  explicitly.
 ;;
 ;; Extensions to po-mode:
 ;;
@@ -613,8 +614,8 @@ position, ignoring `po-ignore-in-search'."
      until (string-match (po-add-ignores s) msgid)))
 
 (defun po-replace-in-msgstrs (s r)
-  "Replace S by R in all msgstrs. Preserves capitalization. (We
-cannot ignore characters here, since we don't know where to
+  "Replace S by R in all msgstrs. Preserves capitalization.
+(We cannot ignore characters here, since we don't know where to
 insert them again.)"
   (interactive "sFind: \nsReplace with: ")
   (while (re-search-forward s nil t)

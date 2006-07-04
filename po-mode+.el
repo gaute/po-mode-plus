@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.3
-;; Last-Updated: Mon Jul  3 23:35:23 2006 (7200 CEST)
+;; Last-Updated: Tue Jul  4 10:58:27 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 105
+;;     Update #: 108
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -104,6 +104,8 @@
 ;;  editing `po-mode.el'. Perhaps it should be kept, made into a
 ;;  non-customizable variable? The way I do it now overrides the old
 ;;  preference.
+;;
+;;  `po-mode-version' is probably not as nice in XEmacs.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;

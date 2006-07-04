@@ -356,7 +356,7 @@ If ADD is t, add the field if it's missing."
 
 (defun po-remove-context-comment (msg)
   "Removes any KDE-style context comment from MSG."
-  (if (string-match "^_:.*\n" msg)
+  (if (string-match "^_n?:.*\n" msg)
       (replace-match "" nil nil msg)
       msg))
 

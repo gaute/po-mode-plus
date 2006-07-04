@@ -255,6 +255,21 @@ M-S  Ignore path          M-A  Ignore PO file      *M-L  Ignore lexicon
 	 '(:help "Use this text as the translation and close current edit buffer"))])
   "Menu layout for PO subedit mode.")
 
+;; List the variables we use from po-mode.el, to avoid byte-compiler
+;; warnings.
+(defvar po-translated-counter)
+(defvar po-untranslated-counter)
+(defvar po-fuzzy-counter)
+(defvar po-obsolete-counter)
+(defvar po-start-of-entry)
+(defvar po-end-of-entry)
+(defvar po-start-of-msgid)
+(defvar po-start-of-msgstr)
+(defvar po-entry-type)
+(defvar po-read-only)
+(defvar po-edited-fields)
+(defvar po-subedit-back-pointer)
+
 
 ;; REPLACES ORIGINAL in `po-mode.el'
 ;; Fixed the fuzzy counter.

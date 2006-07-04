@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.3
-;; Last-Updated: Tue Jul  4 10:58:27 2006 (7200 CEST)
+;; Last-Updated: Tue Jul  4 22:03:23 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 108
+;;     Update #: 123
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -156,10 +156,14 @@
   (remove-hook 'write-contents-hooks 'po-replace-revision-date)
   (add-hook 'write-contents-hooks 'po-update-header)
   (define-key po-mode-map "g" 'po-select-entry-number)
+  (define-key po-mode-map "l" 'po-lookup-lexicon)
+  (define-key po-mode-map "L" 'po-copy-from-lexicon)
   (define-key po-mode-map "\C-c\C-m" 'po-find-msg)
   (define-key po-mode-map "\C-c\C-s" 'po-find-msgstr)
   (define-key po-mode-map "\C-c\C-i" 'po-find-msgid)
   (define-key po-mode-map "\C-c\C-r" 'po-replace-in-msgstrs)
+  (define-key po-mode-map "\M-l" 'po-edit-lexicon-entry)
+  (define-key po-mode-map "\M-L" 'po-select-lexicon)
   (define-key po-subedit-mode-map "\C-c\C-a" 'po-subedit-insert-next-arg)
   (define-key po-subedit-mode-map "\C-c\C-t" 'po-subedit-insert-next-tag))
 
@@ -206,7 +210,7 @@ untranslated and fuzzy entries in the same run."
   :group 'po)
 
 ;; REPLACES ORIGINAL in `po-mode.el'
-;; Added "g".
+;; Added "g" and "Search and replace" section.
 (defconst po-help-display-string
   (_"\
 PO Mode Summary           Next Previous            Miscellaneous
@@ -229,10 +233,16 @@ M-,  Mark translatable    *c    To compendium      r  Pop and return
 M-.  Change mark, mark    *M-C  Select, save       x  Exchange current/top
 
 Program Sources           Auxiliary Files          Lexicography
-s    Cycle reference      a    Cycle file          *l    Lookup translation
-M-s  Select reference     C-c C-a  Select file     *M-l  Add/edit translation
-S    Consider path        A    Consider PO file    *L    Consider lexicon
-M-S  Ignore path          M-A  Ignore PO file      *M-L  Ignore lexicon
+s    Cycle reference      a    Cycle file          l    Lookup translation
+M-s  Select reference     C-c C-a  Select file     M-l  Edit search result
+S    Consider path        A    Consider PO file    L    Insert search result
+M-S  Ignore path          M-A  Ignore PO file      *M-L  Cycle lexicon
+
+Search and replace
+C-c C-m  Find message
+C-c C-s  Find msgstr
+C-c C-i  Find msgid
+C-c C-r  Replace in msgstrs
 ")
   "Help page for PO mode.")
 
@@ -630,8 +640,11 @@ position, ignoring `po-ignore-in-search'."
 
 (defun po-replace-in-msgstrs (s r)
   "Replace S by R in all msgstrs. Preserves capitalization.
-(We cannot ignore characters here, since we don't know where to
-insert them again.)"
+ (We cannot ignore characters here, since we don't know where to
+insert them again.)
+
+BUG: Fails if the wordwrapping is different. We have to extract
+the msgstr as a string. It'll be slower, but accurate."
   (interactive "sFind: \nsReplace with: ")
   (while (re-search-forward s nil t)
     ;; `re-search-forward' may find matches outside the msgstr, but
@@ -639,6 +652,110 @@ insert them again.)"
     (po-find-span-of-entry)
     (po-set-msgstr (replace-regexp-in-string s r (po-get-msgstr nil)))
     (po-current-entry)))
+
+
+;;; Lexicography
+
+(defvar po-base-dir "/Users/gaute/skulelinux/trunk/i18n/openoffice/po/nn/")
+(defvar po-auxiliary-base-dir "/Users/gaute/skulelinux/trunk/i18n/openoffice/po/da/")
+
+;; The buffer where search results should show up. This is suggested
+;; to be in a separate frame that is always open.
+(defvar po-search-buffer "*po-search*")
+
+(defun po-auxiliary-file ()
+  "Returns the name of the auxiliary file to the current file, or
+nil if the auxiliary file doesn't exist."
+  (let ((aux (replace-regexp-in-string po-base-dir po-auxiliary-base-dir
+				       (buffer-file-name))))
+    (if (file-exists-p aux)
+	aux)))
+
+(defun po-lookup-file (name)
+  "Search the PO file NAME for a msgid equal to the current
+msgid. Display the result in `po-search-buffer'.
+
+The search is slow because it has to extract and compare the
+msgid from each entry in NAME. If we don't do that, we will fail
+to match entries where the linewrapping differs.
+
+This function is heavily based on `po-seek-equivalent-translation'. 
+It might be possible to merge them."
+  (po-find-span-of-entry)
+  (let ((msgid (po-get-msgid nil))
+	string
+	(current (current-buffer))
+	(buffer (find-file-noselect name)))
+    (set-buffer buffer)
+    (let ((start (point))
+	  found)
+      (goto-char (point-min))
+      (while (and (not found) (po-next-entry))
+	(let ((looked-up (po-get-msgid nil)))
+	  (if (and (string-equal msgid looked-up)
+		   ;; Ignore an untranslated entry.
+		   (not (string-equal "" (po-get-msgstr nil))))
+	      (setq found t))))
+      (if found
+	  (progn
+	    (set-buffer buffer)
+	    (po-find-span-of-entry)
+	    (setq string (po-get-msgstr nil))
+	    (set-buffer po-search-buffer)
+	    (delete-region (point-min) (point-max))
+	    (insert string))
+	  (set-buffer po-search-buffer)
+	  (delete-region (point-min) (point-max))
+	  (message (_"Not found")))
+      found)))
+
+(defun po-lookup-lexicon ()
+  "Lookup the current string in the lexicon."
+  (interactive)
+  (po-lookup-file (po-auxiliary-file)))
+
+(defun po-get-lookup ()
+  "Returns the search result."
+  (save-excursion
+    (set-buffer po-search-buffer)
+    (buffer-string)))
+
+(defun po-copy-from-lexicon ()
+  "Copy the looked-up string to the current message."
+  (interactive)
+  (po-find-span-of-entry)
+  (let ((buffer-read-only po-read-only)
+	(entry-type po-entry-type)
+	replacement)
+    (save-excursion
+      (if (or (eq entry-type 'untranslated)
+	      (eq entry-type 'obsolete)
+	      (y-or-n-p (_"Really lose previous translation? ")))
+	  (setq replacement (po-get-lookup))))
+    (when replacement
+      (po-set-msgstr replacement))))
+
+(defun po-subedit-copy-from-lexicon ()
+  "Inserts the search result into the buffer. Intended for the
+subedit buffer. FIXME: Should it ask for confirmation before
+overwriting anything, or is regular undo safe enough?"
+  (interactive)
+  (let (replacement)
+    (save-excursion
+      (set-buffer po-search-buffer)
+      (setq replacement (buffer-string)))
+    (delete-region (point-min) (point-max))
+    (insert replacement)))
+
+(defun po-edit-lexicon-entry ()
+  "Open the looked-up entry in a buffer where you can edit it."
+  (interactive)
+  (find-file (po-auxiliary-file)))
+
+(defun po-select-lexicon ()
+  "Cycles the available lexicons."
+  (interactive)
+  (error "Not yet implemented"))
 
 (provide 'po-mode+)
 

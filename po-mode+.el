@@ -536,10 +536,10 @@ Run functions on po-subedit-mode-hook."
   "List of arguments in a msgid, found by `po-find-args'.")
 
 (defvar po-xml-tag-regexp "\\(<[^>]+>\\|&[a-z]+;\\)"
-  "Matches XML tags and entities.")
+  "*Matches XML tags and entities.")
 
 (defvar po-args-regexp "\\(%[-+# ]?[0-9*]+?\\(\\.[0-9*]\\)?[hlL]?[cdieEfgGosuxXpn]\\|%L?[0-9]\\|\\$\\[[a-z]+\\]\\|%[A-Z_]+\\|\\$[a-z_]+\\$\\)"
-  "Matches various argument types:
+  "*Matches various argument types:
    %[-+ #]?[0-9*]?\\(\\.[0-9*]\\)?[hlL]?[cdieEfgGosuxXpn]
                               C-style printf arguments
    %L?[0-9]           %1      Qt
@@ -579,8 +579,8 @@ Run functions on po-subedit-mode-hook."
 ;;; Search and replace.
 
 (defvar po-ignore-in-search "[&~]"
-  "Regexp to ignore when searching, inserted between every
-  character. (Useful for accelerators.)")
+  "*Regexp to ignore when searching, inserted between every
+character. (Useful for accelerators.)")
 
 (defun po-add-ignores (s)
   "Returns S with the ignore pattern `po-ignore-in-search' added

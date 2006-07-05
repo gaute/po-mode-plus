@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.3
-;; Last-Updated: Tue Jul  4 22:03:23 2006 (7200 CEST)
+;; Last-Updated: Wed Jul  5 11:49:53 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 123
+;;     Update #: 127
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -87,6 +87,9 @@
 ;;  string with another in all the msgstrs from the current point to
 ;;  the end of the file.
 ;;
+;;  If `longlines-mode' is available, it will be used for linewrapping
+;;  in the subedit buffer.
+;;
 ;; Bugfixes to po-mode:
 ;;
 ;;  The fuzzy counter is fixed. Entries that are fuzzy at the same
@@ -150,11 +153,17 @@
 
 ;; Replaces `po-replace-revision-date' with `po-update-header' on
 ;; `write-contents-hook'.
+;; Turn on wrapping with `longlines-mode' in the subedit buffer.
 ;; Adds keybindings.
 (defun po-mode+ ()
   "To be run on `po-mode-hook'."
   (remove-hook 'write-contents-hooks 'po-replace-revision-date)
   (add-hook 'write-contents-hooks 'po-update-header)
+  (when (featurep 'longlines)
+    ;; Turn on and off longlines-mode to wrap when editing a message
+    ;; and unwrap before putting it back.
+    (add-hook 'po-subedit-mode-hook 'longlines-mode)
+    (add-hook 'po-subedit-exit-hook 'longlines-mode))
   (define-key po-mode-map "g" 'po-select-entry-number)
   (define-key po-mode-map "l" 'po-lookup-lexicon)
   (define-key po-mode-map "L" 'po-copy-from-lexicon)

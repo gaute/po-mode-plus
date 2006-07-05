@@ -699,7 +699,8 @@ It might be possible to merge them."
     (let ((start (point))
 	  found)
       (goto-char (point-min))
-      (while (and (not found) (po-next-entry))
+      (while (and (not found) (re-search-forward "^msgid" nil t))
+	(po-find-span-of-entry)
 	(let ((looked-up (po-get-msgid nil)))
 	  (if (and (string-equal msgid looked-up)
 		   ;; Ignore an untranslated entry.
@@ -710,11 +711,8 @@ It might be possible to merge them."
 	    (set-buffer buffer)
 	    (po-find-span-of-entry)
 	    (setq string (po-get-msgstr nil))
-	    (set-buffer po-search-buffer)
-	    (delete-region (point-min) (point-max))
-	    (insert string))
-	  (set-buffer po-search-buffer)
-	  (delete-region (point-min) (point-max))
+	    (po-set-lookup string))
+	  (po-empty-search)
 	  (message (_"Not found")))
       found)))
 
@@ -722,6 +720,19 @@ It might be possible to merge them."
   "Lookup the current string in the lexicon."
   (interactive)
   (po-lookup-file (po-auxiliary-file)))
+
+(defun po-empty-search ()
+  "Empties the search buffer."
+  (save-excursion
+    (set-buffer po-search-buffer)
+    (delete-region (point-min) (point-max))))
+
+(defun po-set-lookup (string)
+  "Places a search result into the search buffer."
+  (save-excursion
+    (set-buffer (get-buffer-create po-search-buffer))
+    (delete-region (point-min) (point-max))
+    (insert string)))
 
 (defun po-get-lookup ()
   "Returns the search result."

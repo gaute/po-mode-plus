@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.3
-;; Last-Updated: Wed Jul  5 20:57:40 2006 (7200 CEST)
+;; Last-Updated: Wed Jul  5 21:47:47 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 135
+;;     Update #: 141
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -43,6 +43,8 @@
 ;;
 ;; Extensions to po-mode:
 ;;
+;;  po-mode+ 0.1, 0.2
+;;
 ;;  `po-update-header' is a generalization of the function that
 ;;  updates 'PO-Revision-Date'. It now updates 'Last-Translator',
 ;;  'Language-Team' and 'X-Generator' too. `po-translator',
@@ -70,6 +72,8 @@
 ;;  `po-select-entry-number' is bound to 'g'. It asks for an entry
 ;;  number and selects it.
 ;;
+;;  po-mode+ 0.3
+;;
 ;;  `po-find-msg' (C-c C-m) searches for a message containing a
 ;;  string. The pattern in `po-ignore-in-search' defines characters to
 ;;  ignore.  This is useful for accelerators, which are typically
@@ -86,6 +90,8 @@
 ;;  `po-replace-in-msgstrs' (C-c C-r) is a function that replaces a
 ;;  string with another in all the msgstrs from the current point to
 ;;  the end of the file.
+;;
+;;  po-mode+ 0.4
 ;;
 ;;  If `longlines-mode' is available, it will be used for linewrapping
 ;;  in the subedit buffer.

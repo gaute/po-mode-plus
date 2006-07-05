@@ -200,15 +200,16 @@
     (add-hook 'po-subedit-mode-hook '(lambda () (longlines-mode 1)))
     (add-hook 'po-subedit-exit-hook '(lambda () (longlines-mode 0))))
   (define-key po-mode-map "g" 'po-select-entry-number)
-  (define-key po-mode-map "l" 'po-lookup-lexicon)
-  (define-key po-mode-map "L" 'po-copy-from-lexicon)
+  (define-key po-mode-map "l" 'po-lookup)
+  (define-key po-mode-map "L" 'po-copy-from-lookup)
   (define-key po-mode-map "\C-c\C-m" 'po-find-msg)
   (define-key po-mode-map "\C-c\C-s" 'po-find-msgstr)
   (define-key po-mode-map "\C-c\C-i" 'po-find-msgid)
   (define-key po-mode-map "\C-c\C-r" 'po-replace-in-msgstrs)
-  (define-key po-mode-map "\M-l" 'po-edit-lexicon-entry)
-  (define-key po-mode-map "\M-L" 'po-select-lexicon)
+  (define-key po-mode-map "\M-l" 'po-edit-lookup-entry)
+  (define-key po-mode-map "\M-L" 'po-select-lookup-method)
   (define-key po-subedit-mode-map "\C-c\C-a" 'po-subedit-insert-next-arg)
+  (define-key po-subedit-mode-map "\C-c\C-l" 'po-subedit-copy-from-lookup)
   (define-key po-subedit-mode-map "\C-c\C-t" 'po-subedit-insert-next-tag))
 
 (add-hook 'po-mode-hook 'po-mode+)
@@ -276,11 +277,11 @@ gettext Keyword Marking                            Position Stack
 M-,  Mark translatable    *c    To compendium      r  Pop and return
 M-.  Change mark, mark    *M-C  Select, save       x  Exchange current/top
 
-Program Sources           Auxiliary Files          Lexicography
+Program Sources           Auxiliary Files          Lookup
 s    Cycle reference      a    Cycle file          l    Lookup translation
 M-s  Select reference     C-c C-a  Select file     M-l  Edit search result
 S    Consider path        A    Consider PO file    L    Insert search result
-M-S  Ignore path          M-A  Ignore PO file      *M-L  Cycle lexicon
+M-S  Ignore path          M-A  Ignore PO file      *M-L  Cycle lookup
 
 Search and replace
 C-c C-m  Find message
@@ -698,7 +699,7 @@ the msgstr as a string. It'll be slower, but accurate."
     (po-current-entry)))
 
 
-;;; Lexicography
+;;; Lookup
 
 (defvar po-lookup-replace "/nn/"
   "A regexp representing the part of the full filename to replace
@@ -757,8 +758,8 @@ It might be possible to merge them."
 	  (message (_"Not found")))
       found)))
 
-(defun po-lookup-lexicon ()
-  "Lookup the current string in the lexicon."
+(defun po-lookup ()
+  "Lookup the current string using the selected lookup method."
   (interactive)
   (po-lookup-in-file (po-auxiliary-file)))
 
@@ -781,8 +782,8 @@ It might be possible to merge them."
     (set-buffer po-search-buffer)
     (buffer-string)))
 
-(defun po-copy-from-lexicon ()
-  "Copy the looked-up string to the current message."
+(defun po-copy-from-lookup ()
+  "Copy the selected lookup result to the current message."
   (interactive)
   (po-find-span-of-entry)
   (let ((buffer-read-only po-read-only)
@@ -796,10 +797,9 @@ It might be possible to merge them."
     (when replacement
       (po-set-msgstr replacement))))
 
-(defun po-subedit-copy-from-lexicon ()
+(defun po-subedit-copy-from-lookup ()
   "Inserts the search result into the buffer. Intended for the
-subedit buffer. FIXME: Should it ask for confirmation before
-overwriting anything, or is regular undo safe enough?"
+subedit buffer."
   (interactive)
   (let (replacement)
     (save-excursion
@@ -808,13 +808,13 @@ overwriting anything, or is regular undo safe enough?"
     (delete-region (point-min) (point-max))
     (insert replacement)))
 
-(defun po-edit-lexicon-entry ()
+(defun po-edit-lookup-entry ()
   "Open the looked-up entry in a buffer where you can edit it."
   (interactive)
   (find-file (po-auxiliary-file)))
 
-(defun po-select-lexicon ()
-  "Cycles the available lexicons."
+(defun po-select-lookup-method ()
+  "Cycles the available lookup methods."
   (interactive)
   (error "Not yet implemented"))
 

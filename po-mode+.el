@@ -96,6 +96,35 @@
 ;;  If `longlines-mode' is available, it will be used for linewrapping
 ;;  in the subedit buffer.
 ;;
+;;  Lookup
+;;
+;;    There were some unimplemented "lexicography" functions in
+;;    po-mode, probably intended for dictionary lookups. (They've been
+;;    left unimplemented for years, as far as I can tell.)  I adapted
+;;    these to my purpose: A generic lookup feature for auxiliary
+;;    files, translation memories, dictionaries, etc. The search
+;;    result is displayed in `po-search-buffer', which is suggested to
+;;    be left open in a separate frame.
+;;
+;;    So far, only the auxiliary search is implemented. It resembles
+;;    KBabel's auxiliary feature, but is more flexible when it comes
+;;    to picking the right file. It partly duplicates po-mode's
+;;    existing auxiliary feature, but I find it more convenient to
+;;    work with.
+;;
+;;    `po-lookup' (l) looks up the current msgid using the selected
+;;    lookup method.
+;;
+;;    `po-copy-from-lookup' (L) copies the selected lookup result to
+;;    the current entry. `po-subedit-copy-from-lookup' (C-c C-l) does
+;;    the same thing while editing a message.
+;;
+;;    `po-edit-lookup-entry' (M-l) opens a buffer where you can edit
+;;    the lookup result, if that is possible.
+;;
+;;    `po-select-lookup-method' (M-L) will cycle between the lookup
+;;    methods as soon as I implement more than just auxiliary search.
+;;
 ;; Bugfixes to po-mode:
 ;;
 ;;  The fuzzy counter is fixed. Entries that are fuzzy at the same

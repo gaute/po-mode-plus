@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.3
-;; Last-Updated: Wed Jul  5 12:04:07 2006 (7200 CEST)
+;; Last-Updated: Wed Jul  5 20:56:06 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 128
+;;     Update #: 133
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -162,8 +162,8 @@
   (when (featurep 'longlines)
     ;; Turn on and off longlines-mode to wrap when editing a message
     ;; and unwrap before putting it back.
-    (add-hook 'po-subedit-mode-hook 'longlines-mode)
-    (add-hook 'po-subedit-exit-hook 'longlines-mode))
+    (add-hook 'po-subedit-mode-hook '(lambda () (longlines-mode 1)))
+    (add-hook 'po-subedit-exit-hook '(lambda () (longlines-mode 0))))
   (define-key po-mode-map "g" 'po-select-entry-number)
   (define-key po-mode-map "l" 'po-lookup-lexicon)
   (define-key po-mode-map "L" 'po-copy-from-lexicon)

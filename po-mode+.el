@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.3
-;; Last-Updated: Wed Jul  5 11:49:53 2006 (7200 CEST)
+;; Last-Updated: Wed Jul  5 12:04:07 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 127
+;;     Update #: 128
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -696,8 +696,7 @@ It might be possible to merge them."
 	(current (current-buffer))
 	(buffer (find-file-noselect name)))
     (set-buffer buffer)
-    (let ((start (point))
-	  found)
+    (let (found)
       (goto-char (point-min))
       (while (and (not found) (re-search-forward "^msgid" nil t))
 	(po-find-span-of-entry)
@@ -709,7 +708,6 @@ It might be possible to merge them."
       (if found
 	  (progn
 	    (set-buffer buffer)
-	    (po-find-span-of-entry)
 	    (setq string (po-get-msgstr nil))
 	    (po-set-lookup string))
 	  (po-empty-search)

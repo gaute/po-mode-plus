@@ -6,16 +6,16 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.3
-;; Last-Updated: Wed Jul  5 21:47:47 2006 (7200 CEST)
+;; Last-Updated: Wed Jul  5 22:01:01 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 141
+;;     Update #: 142
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
 ;;
 ;; Features that might be required by this library:
 ;;
-;;   `cl', `po-mode'
+;;   `cl', `longlines', `po-mode'
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;

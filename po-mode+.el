@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.3
-;; Last-Updated: Wed Jul  5 22:01:01 2006 (7200 CEST)
+;; Last-Updated: Fri Jul  7 17:32:34 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 142
+;;     Update #: 148
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -112,6 +112,8 @@
 ;;    existing auxiliary feature, but I find it more convenient to
 ;;    work with.
 ;;
+;;    (The lookup features are still very much a work in progress.)
+;;
 ;;    `po-lookup' (l) looks up the current msgid using the selected
 ;;    lookup method.
 ;;
@@ -171,7 +173,7 @@
 ;;   case loop pop
 (eval-when-compile (require 'cl))
 
-(defconst po-mode+-version-string "0.3" 
+(defconst po-mode+-version-string "0.4" 
   "Version number of this version of po-mode+.el.")
 
 ;; REPLACES ORIGINAL in `po-mode.el'
@@ -186,12 +188,14 @@
     (message msg)
     msg))
 
-;; Replaces `po-replace-revision-date' with `po-update-header' on
-;; `write-contents-hook'.
-;; Turn on wrapping with `longlines-mode' in the subedit buffer.
-;; Adds keybindings.
 (defun po-mode+ ()
-  "To be run on `po-mode-hook'."
+  "Run on `po-mode-hook' to initialize the po-mode extensions:
+
+- Replaces `po-replace-revision-date' with `po-update-header' on
+  `write-contents-hook'.
+- Turns on wrapping with `longlines-mode' in the subedit buffer.
+- Adds keybindings.
+"
   (remove-hook 'write-contents-hooks 'po-replace-revision-date)
   (add-hook 'write-contents-hooks 'po-update-header)
   (when (featurep 'longlines)
@@ -769,18 +773,35 @@ It might be possible to merge them."
     (set-buffer po-search-buffer)
     (delete-region (point-min) (point-max))))
 
+(defface po-lookup-face
+    '((t (:family "helv")))
+  "Face for displaying lookup results.")
+
 (defun po-set-lookup (string)
-  "Places a search result into the search buffer."
+  "Places a search result into `po-search-buffer'."
+  ;; FIXME: This will not display the buffer, only put the result into
+  ;; it. This works nicely in a windowing environment, when the buffer
+  ;; is left open in a separate frame. It should a) set that up
+  ;; automatically, and b) provide an alternative for terminal users.
   (save-excursion
     (set-buffer (get-buffer-create po-search-buffer))
-    (delete-region (point-min) (point-max))
-    (insert string)))
+    (po-empty-search)
+    (insert string)
+    (when (featurep 'longlines)
+      (longlines-mode 1))
+    (add-text-properties (point-min) (point-max)
+			 '(face po-lookup-face))))
 
 (defun po-get-lookup ()
   "Returns the search result."
   (save-excursion
     (set-buffer po-search-buffer)
-    (buffer-string)))
+    (when (featurep 'longlines)
+      (longlines-mode 0))
+    (let ((string (buffer-string)))
+      (when (featurep 'longlines)
+	(longlines-mode 1))
+      string)))
 
 (defun po-copy-from-lookup ()
   "Copy the selected lookup result to the current message."

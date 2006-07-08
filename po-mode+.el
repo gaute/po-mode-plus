@@ -5,10 +5,10 @@
 ;; Author: Gaute Hvoslef Kvalnes <gaute@verdsveven.com>
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
-;; Version: 0.3
-;; Last-Updated: Sat Jul  8 01:24:30 2006 (7200 CEST)
+;; Version: 0.4
+;; Last-Updated: Sun Jul  9 00:44:58 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 154
+;;     Update #: 160
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -104,7 +104,8 @@
 ;;    these to my purpose: A generic lookup feature for auxiliary
 ;;    files, translation memories, dictionaries, etc. The search
 ;;    result is displayed in `po-lookup-buffer', which is suggested to
-;;    be left open in a separate frame.
+;;    be left open in a separate frame. (`po-setup-lookup-frame' will
+;;    set up such a frame.)
 ;;
 ;;    So far, only the auxiliary search is implemented. It resembles
 ;;    KBabel's auxiliary feature, but is more flexible when it comes
@@ -724,16 +725,19 @@ the msgstr as a string. It'll be slower, but accurate."
 (defvar po-lookup-buffer "*po-lookup*")
 
 (defun po-setup-lookup-frame ()
-  "Set up the lookup frame and switch back again to the current
-frame."
+  "Set up a separate frame to display the lookup result, and
+switch back again to the current frame."
   (interactive)
   (select-frame (make-frame '((name . "PO lookup")
 			      (width . 59)
-			      (height . 16))))
+			      (height . 16)
+			      (minibuffer . nil))))
   (switch-to-buffer (get-buffer-create po-lookup-buffer))
   (delete-other-windows)
   (set-fill-column 59)
   (set-frame-font "-apple-bitstream vera sans-medium-r-normal--0-0-0-0-m-0-mac-roman")
+  ;; FIXME: This doesn't always switch back to the frame that we
+  ;; started from.
   (previous-multiframe-window))
 
 (defun po-lookup-file ()
@@ -791,13 +795,8 @@ It might be possible to merge them."
     (set-buffer po-lookup-buffer)
     (delete-region (point-min) (point-max))))
 
-(defface po-lookup-face
-    '((t (:family "helv")))
-  "Face for displaying lookup results.")
-
 (defun po-set-lookup (string)
   "Place a search result into `po-lookup-buffer'."
-  ;; FIXME: There should be an alternative for terminal users.
   (let ((display-buffer-reuse-frames t))
     (save-excursion
       (set-buffer (get-buffer-create po-lookup-buffer))
@@ -831,7 +830,8 @@ It might be possible to merge them."
 	      (y-or-n-p (_"Really lose previous translation? ")))
 	  (setq replacement (po-get-lookup))))
     (when replacement
-      (po-set-msgstr replacement))))
+      (po-set-msgstr replacement))
+    (message "")))
 
 (defun po-subedit-copy-from-lookup ()
   "Insert the search result into the buffer. Intended for the

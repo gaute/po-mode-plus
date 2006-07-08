@@ -583,8 +583,8 @@ Run functions on po-subedit-mode-hook."
 	      (buffer (current-buffer))
 	      overlay slot)
 	  (if (and (eq type 'msgstr) po-highlighting)
-	      ;; ;; Try showing all of msgid in the upper window while editing.
-	      ;; (goto-char (1- po-start-of-msgstr))
+	      ;; Try showing all of msgid in the upper window while editing.
+	      (goto-char po-start-of-msgstr)
 	      ;; (recenter -1)
 	      (save-excursion
 		(goto-char po-start-of-entry)

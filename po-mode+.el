@@ -258,6 +258,19 @@ untranslated and fuzzy entries in the same run."
   :type 'string
   :group 'po)
 
+(defcustom po-lookup-replace "/nn/"
+  "*A regexp representing the part of the full filename to replace
+when generating the name of the file to search in. Replaced by
+`po-lookup-replace-with'."
+  :type 'string
+  :group 'po)
+
+(defcustom po-lookup-replace-with "/da/"
+  "*The string that replaces `po-lookup-replace' when generating
+the name of the file to search in."
+  :type 'string
+  :group 'po)
+
 ;; REPLACES ORIGINAL in `po-mode.el'
 ;; Added "g" and "Search and replace" section.
 ;; Changed "Lexicography" into "Lookup".
@@ -705,15 +718,6 @@ the msgstr as a string. It'll be slower, but accurate."
 
 
 ;;; Lookup
-
-(defvar po-lookup-replace "/nn/"
-  "A regexp representing the part of the full filename to replace
-when generating the name of the file to search in. Replaced by
-`po-lookup-replace-with'.")
-
-(defvar po-lookup-replace-with "/da/"
-  "The string that replaces `po-lookup-replace' when generating
-the name of the file to search in.")
 
 ;; The buffer where search results should show up. This is suggested
 ;; to be in a separate frame that is always open.

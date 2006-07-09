@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.4
-;; Last-Updated: Sun Jul  9 16:59:54 2006 (7200 CEST)
+;; Last-Updated: Sun Jul  9 17:18:39 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 173
+;;     Update #: 175
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -215,7 +215,9 @@
   (define-key po-mode-map "\M-L" 'po-select-lookup-method)
   (define-key po-subedit-mode-map "\C-c\C-a" 'po-subedit-insert-next-arg)
   (define-key po-subedit-mode-map "\C-c\C-l" 'po-subedit-copy-from-lookup)
-  (define-key po-subedit-mode-map "\C-c\C-t" 'po-subedit-insert-next-tag))
+  (define-key po-subedit-mode-map "\C-c\C-t" 'po-subedit-insert-next-tag)
+  (when po-always-setup-lookup-frame
+    (po-setup-lookup-frame)))
 
 (add-hook 'po-mode-hook 'po-mode+)
 

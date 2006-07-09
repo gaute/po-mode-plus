@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.4
-;; Last-Updated: Sun Jul  9 00:44:58 2006 (7200 CEST)
+;; Last-Updated: Sun Jul  9 15:57:37 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 160
+;;     Update #: 166
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -754,10 +754,6 @@ the full filename. Returns nil if the file doesn't exist."
   "Search the PO file NAME for a msgid equal to the current
 msgid. Display the result in `po-lookup-buffer'.
 
-The search is slow because it has to extract and compare the
-msgid from each entry in NAME. If we don't do that, we will fail
-to match entries where the linewrapping differs.
-
 This function is heavily based on `po-seek-equivalent-translation'. 
 It might be possible to merge them."
   (po-find-span-of-entry)
@@ -766,14 +762,25 @@ It might be possible to merge them."
 	(current (current-buffer))
 	(buffer (find-file-noselect name)))
     (set-buffer buffer)
-    (let (found)
+    ;; Find the first word of the msgid.
+    (string-match "^[^ ]+" msgid)
+    (let (found
+	  (first-word (match-string 0 msgid)))
       (goto-char (point-min))
-      (while (and (not found) (re-search-forward "^msgid" nil t))
+      ;; Find potential matches by searching for `first-word'. This
+      ;; is faster than looking at every msgid, since the exact
+      ;; comparison is slow. The search for "^msgid" is done to make
+      ;; sure we move to a new message before searching for new
+      ;; matches.
+      (while (and (not found)
+		  (re-search-forward "^msgid" nil t)
+		  (re-search-forward first-word nil t))
 	(po-find-span-of-entry)
 	(let ((looked-up (po-get-msgid nil)))
+	  ;; See if the potential match is a real match and make sure
+	  ;; it's not untranslated.
 	  (if (and (string-equal msgid looked-up)
-		   ;; Ignore an untranslated entry.
-		   (not (string-equal "" (po-get-msgstr nil))))
+		   (not (eq 'untranslated po-entry-type)))
 	      (setq found t))))
       (if found
 	  (progn

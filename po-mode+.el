@@ -590,7 +590,9 @@ no entries of the other types."
   (loop for i from 1 to num
        initially (po-first-entry)
        do (po-next-entry)
-       finally (po-current-entry)))
+       when (= 0 (mod i 10)) do (message "%i" i)
+       finally (progn (po-current-entry)
+		      (message "%i" num))))
 
 
 ;;; Editing management and submode.

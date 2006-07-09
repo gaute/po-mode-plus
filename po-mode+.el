@@ -259,14 +259,14 @@ untranslated and fuzzy entries in the same run."
   :type 'string
   :group 'po)
 
-(defcustom po-lookup-replace "/nn/"
+(defcustom po-lookup-replace ""
   "*A regexp representing the part of the full filename to replace
 when generating the name of the file to search in. Replaced by
 `po-lookup-replace-with'."
   :type 'string
   :group 'po)
 
-(defcustom po-lookup-replace-with "/da/"
+(defcustom po-lookup-replace-with ""
   "*The string that replaces `po-lookup-replace' when generating
 the name of the file to search in."
   :type 'string

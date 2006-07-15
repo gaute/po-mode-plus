@@ -6,9 +6,9 @@
 ;; Copyright (C) 2006, Gaute Hvoslef Kvalnes.
 ;; Created: Thu Jun 22 13:42:15 CEST 2006
 ;; Version: 0.4
-;; Last-Updated: Sun Jul  9 17:18:39 2006 (7200 CEST)
+;; Last-Updated: Sat Jul 15 20:40:04 2006 (7200 CEST)
 ;;           By: Gaute Hvoslef Kvalnes
-;;     Update #: 175
+;;     Update #: 179
 ;; URL: http://www.emacswiki.org/cgi-bin/wiki/po-mode+.el
 ;; Keywords: i18n, gettext
 ;; Compatibility: GNU Emacs 22.x
@@ -467,8 +467,10 @@ If ADD is t, add the field if it's missing."
 	    (po-replace-header-field
 	     "PO-Revision-Date"
 	     (concat (format-time-string "%Y-%m-%d %H:%M" time) zone) t))
-	  (po-replace-header-field "Last-Translator" po-translator t)
-	  (po-replace-header-field "Language-Team" po-language-team t)
+          (unless (string-equal po-translator po-translator-default)
+            (po-replace-header-field "Last-Translator" po-translator t))
+          (unless (string-equal po-language-team po-language-team-default)
+            (po-replace-header-field "Language-Team" po-language-team t))
 	  (po-replace-header-field "X-Generator" po-x-generator t)))))
 
 (defun po-remove-context-comment (msg)

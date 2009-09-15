@@ -1,0 +1,24 @@
+;;; po-mode+.el --- Extensions to GNU gettext's `po-mode.el'.
+;;
+;;; Commentary:
+;;
+;; This package is an extension to `po-mode.el', GNU Gettext's major
+;; mode for editing PO files. It is made for po-mode version 2.01, and
+;; is not likely to work with later versions (yet).
+;;
+;; Although written, tested and used in Emacs 22.x, po-mode+ might
+;; work in other versions too.
+;;
+;; You may adjust some variables, below, by defining them in your
+;; `.emacs' file, either directly or through command 'M-x customize'.
+;;
+;; Installation:
+;;
+;;  Put this file where Emacs can find it, and place the following in
+;;  your `~/.emacs':
+;;
+;;  (autoload 'po-mode "po-mode+"
+;;   "Major mode for translators to edit PO files" t)
+;;
+;;  Make sure `po-mode.el' is available for Emacs, but don't load it
+;;  explicitly.
